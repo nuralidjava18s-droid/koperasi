@@ -1,6 +1,7 @@
 /* =====================
    STORAGE KOPERASI
 ===================== */
+console.log("storage.js LOADED");
 function getDB(){
   let db = localStorage.getItem("koperasi_db");
 
