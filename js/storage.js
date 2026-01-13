@@ -1,62 +1,30 @@
 /* =====================
-   STORAGE KOPERASI
+   AUTH KOPERASI (FIX)
 ===================== */
 
-const DB_KEY = "koperasi_db";
+function login(){
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+  const errorBox = document.getElementById("error");
 
-console.log("storage.js LOADED");
+  const db = getDB(); // ← dari storage.js
 
-function getDB(){
-  let raw = localStorage.getItem(DB_KEY);
-
-  // Jika belum ada DB
-  if(!raw){
-    const initDB = createDefaultDB();
-    localStorage.setItem(DB_KEY, JSON.stringify(initDB));
-    return initDB;
-  }
-
-  // Jika ada tapi rusak
-  try{
-    const db = JSON.parse(raw);
-    return normalizeDB(db);
-  }catch(e){
-    console.error("DB rusak, reset ulang", e);
-    const initDB = createDefaultDB();
-    localStorage.setItem(DB_KEY, JSON.stringify(initDB));
-    return initDB;
+  if(user === db.user.username && pass === db.user.password){
+    localStorage.setItem("koperasi_login","true");
+    window.location.href = "dashboard.html";
+  }else{
+    errorBox.style.display = "block";
+    errorBox.innerText = "Username atau password salah";
   }
 }
 
-function saveDB(db){
-  localStorage.setItem(DB_KEY, JSON.stringify(db));
+function cekLogin(){
+  if(localStorage.getItem("koperasi_login") !== "true"){
+    window.location.href = "index.html";
+  }
 }
 
-/* =====================
-   HELPER
-===================== */
-
-function createDefaultDB(){
-  return {
-    user: {
-      username: "admin",
-      password: "1234"
-    },
-    anggota: [],
-    simpanan: [],
-    pinjaman: [],
-    transaksi: [],
-    kas: []
-  };
-}
-
-// Pastikan struktur selalu lengkap
-function normalizeDB(db){
-  if(!db.user) db.user = { username: "admin", password: "1234" };
-  if(!Array.isArray(db.anggota)) db.anggota = [];
-  if(!Array.isArray(db.simpanan)) db.simpanan = [];
-  if(!Array.isArray(db.pinjaman)) db.pinjaman = [];
-  if(!Array.isArray(db.transaksi)) db.transaksi = [];
-  if(!Array.isArray(db.kas)) db.kas = [];
-  return db;
+function logout(){
+  localStorage.removeItem("koperasi_login");
+  window.location.href = "index.html";
 }
