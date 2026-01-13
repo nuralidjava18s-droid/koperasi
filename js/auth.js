@@ -1,53 +1,35 @@
 /* =====================
-   AUTH KOPERASI (FIX GITHUB PAGES)
+   AUTH KOPERASI (GITHUB SAFE)
 ===================== */
-
-/* =====================
-   INIT DUMMY DB
-===================== */
-function getDB(){
-    if(!localStorage.getItem("koperasi_db")){
-        const db = {
-            user: {
-                username: "admin", // username default
-                password: "1234"   // password default
-            }
-        };
-        localStorage.setItem("koperasi_db", JSON.stringify(db));
-    }
-
-    return JSON.parse(localStorage.getItem("koperasi_db"));
-}
 
 /* =====================
    LOGIN
 ===================== */
-function login(){
+function login(e){
+    if(e) e.preventDefault();
+
     const user = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value.trim();
     const errorBox = document.getElementById("error");
 
     if(!user || !pass){
-        errorBox.style.display = "block";
-        errorBox.innerText = "Username & password wajib diisi";
+        showError("Username & password wajib diisi");
         return;
     }
 
-    const data = getDB();
+    const db = getDB(); // 🔥 PAKAI DARI storage.js
 
-    if(user === data.user.username && pass === data.user.password){
+    if(user === db.user.username && pass === db.user.password){
         localStorage.setItem("koperasi_login", "true");
         localStorage.setItem("koperasi_user", user);
-
         window.location.href = "dashboard.html";
     }else{
-        errorBox.style.display = "block";
-        errorBox.innerText = "Username atau password salah";
+        showError("Username atau password salah");
     }
 }
 
 /* =====================
-   CEK LOGIN (dipakai di semua halaman)
+   CEK LOGIN
 ===================== */
 function cekLogin(){
     if(localStorage.getItem("koperasi_login") !== "true"){
@@ -63,5 +45,18 @@ function logout(){
         localStorage.removeItem("koperasi_login");
         localStorage.removeItem("koperasi_user");
         window.location.href = "index.html";
+    }
+}
+
+/* =====================
+   HELPER
+===================== */
+function showError(msg){
+    const errorBox = document.getElementById("error");
+    if(errorBox){
+        errorBox.style.display = "block";
+        errorBox.innerText = msg;
+    }else{
+        alert(msg);
     }
 }
