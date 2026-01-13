@@ -1,3 +1,19 @@
+cekLogin();
+
+/* =====================
+   UTIL
+===================== */
+function rupiah(n){
+  return "Rp " + Number(n || 0).toLocaleString("id-ID");
+}
+
+function logout(){
+  if(confirm("Yakin ingin logout?")){
+    localStorage.removeItem("login");
+    location.href = "login.html";
+  }
+}
+
 /* =====================
    LOAD ANGGOTA
 ===================== */
@@ -6,9 +22,9 @@ function loadAnggota(){
   const sel = document.getElementById("anggota");
   if(!sel) return;
 
-  sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
+  sel.innerHTML = `<option value="">-- Pilih Anggota --</option>`;
 
-  (db.anggota || []).forEach(a => {
+  (db.anggota || []).forEach(a=>{
     sel.innerHTML += `<option value="${a.id}">${a.nama}</option>`;
   });
 }
@@ -23,15 +39,15 @@ function loadSimpanan(){
 
   tbody.innerHTML = "";
 
-  (db.simpanan || []).forEach((s, i) => {
-    const anggota = (db.anggota || []).find(a => a.id === s.anggota_id);
+  (db.simpanan || []).forEach((s, i)=>{
+    const anggota = (db.anggota || []).find(a=>a.id===s.anggota_id);
 
     tbody.innerHTML += `
       <tr>
-        <td>${s.tanggal || "-"}</td>
+        <td>${s.tanggal}</td>
         <td>${anggota ? anggota.nama : "-"}</td>
         <td>${s.jenis}</td>
-        <td>Rp ${Number(s.jumlah).toLocaleString("id-ID")}</td>
+        <td>${rupiah(s.jumlah)}</td>
         <td>
           <button onclick="hapusSimpanan(${i})">🗑️</button>
         </td>
@@ -49,15 +65,10 @@ function simpanSimpanan(e){
   const db = getDB();
   if(!Array.isArray(db.simpanan)) db.simpanan = [];
 
-  const anggotaEl = document.getElementById("anggota");
-  const jenisEl   = document.getElementById("jenis");
-  const jumlahEl  = document.getElementById("jumlah");
-  const tanggalEl = document.getElementById("tanggal");
-
-  const anggota_id = anggotaEl ? anggotaEl.value : "";
-  const jenis   = jenisEl ? jenisEl.value : "";
-  const jumlah  = Number(jumlahEl ? jumlahEl.value : 0);
-  const tanggal = tanggalEl ? tanggalEl.value : "";
+  const anggota_id = document.getElementById("anggota").value;
+  const jenis      = document.getElementById("jenis").value;
+  const jumlah     = Number(document.getElementById("jumlah").value);
+  const tanggal    = document.getElementById("tanggal").value;
 
   if(!anggota_id){
     alert("Pilih anggota");
@@ -65,7 +76,7 @@ function simpanSimpanan(e){
   }
 
   if(!jenis){
-    alert("Pilih jenis simpanan (Pokok / Wajib / Sukarela)");
+    alert("Pilih jenis simpanan");
     return;
   }
 
@@ -85,11 +96,7 @@ function simpanSimpanan(e){
   });
 
   saveDB(db);
-
-  if(e.target && e.target.reset){
-    e.target.reset();
-  }
-
+  document.getElementById("formSimpanan").reset();
   loadSimpanan();
 }
 
@@ -110,7 +117,7 @@ function hapusSimpanan(index){
 /* =====================
    INIT
 ===================== */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", ()=>{
   loadAnggota();
   loadSimpanan();
 });
