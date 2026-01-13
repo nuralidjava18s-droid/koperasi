@@ -1,12 +1,16 @@
+cekLogin();
+
 /* =====================
    LOAD ANGGOTA
 ===================== */
 function loadAnggota(){
   const db = getDB();
   const sel = document.getElementById("anggota");
+  if(!sel) return;
+
   sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
 
-  db.anggota.forEach(a=>{
+  (db.anggota || []).forEach(a=>{
     sel.innerHTML += `<option value="${a.id}">${a.nama}</option>`;
   });
 }
@@ -15,29 +19,30 @@ function loadAnggota(){
    HITUNG ANGSURAN
 ===================== */
 ["jumlah","bunga","tenor"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", hitungAngsuran);
+  const el = document.getElementById(id);
+  if(el){
+    el.addEventListener("input", hitungAngsuran);
+  }
 });
 
 function hitungAngsuran(){
   const jumlah = Number(document.getElementById("jumlah").value);
-  const bunga = Number(document.getElementById("bunga").value);
-  const tenor = Number(document.getElementById("tenor").value);
+  const bunga  = Number(document.getElementById("bunga").value);
+  const tenor  = Number(document.getElementById("tenor").value);
 
-  if(jumlah && bunga && tenor){
-    const totalBunga = jumlah * (bunga/100) * tenor;
-    const total = jumlah + totalBunga;
-    const angsuran = total / tenor;
+  if(jumlah > 0 && bunga > 0 && tenor > 0){
+    const totalBunga = jumlah * (bunga / 100) * tenor;
+    const total      = jumlah + totalBunga;
+    const angsuran   = total / tenor;
 
     document.getElementById("angsuran").value =
-      "Rp " + Math.round(angsuran).toLocaleString("id-ID");
+      rupiah(Math.round(angsuran));
+  }else{
+    document.getElementById("angsuran").value = "";
   }
 }
 
 /* =====================
-   SIMPAN PINJAMAN
-===================== */
-
-/* ===========/* =====================
    SIMPAN PINJAMAN
 ===================== */
 function simpanPinjaman(e){
@@ -47,9 +52,10 @@ function simpanPinjaman(e){
   if(!Array.isArray(db.pinjaman)) db.pinjaman = [];
 
   const anggota_id = document.getElementById("anggota").value;
-  const jumlah = Number(document.getElementById("jumlah").value);
-  const tenor = Number(document.getElementById("tenor").value);
-  const tanggal = document.getElementById("tanggal").value;
+  const jumlah     = Number(document.getElementById("jumlah").value);
+  const bunga      = Number(document.getElementById("bunga").value);
+  const tenor      = Number(document.getElementById("tenor").value);
+  const tanggal    = document.getElementById("tanggal").value;
 
   if(!anggota_id){
     alert("Pilih anggota");
@@ -61,47 +67,65 @@ function simpanPinjaman(e){
     return;
   }
 
+  if(!bunga || bunga <= 0){
+    alert("Bunga tidak valid");
+    return;
+  }
+
   if(!tenor || tenor <= 0){
     alert("Tenor tidak valid");
     return;
   }
 
-  const id = "PJ" + String(db.pinjaman.length + 1).padStart(3,"0");
+  const totalBunga = jumlah * (bunga / 100) * tenor;
+  const total      = jumlah + totalBunga;
+
+  const id = "PJ" + Date.now(); // ID aman & unik
 
   db.pinjaman.push({
     id,
     anggota_id,
     jumlah,
+    bunga,
     tenor,
     tanggal,
-    sisa: jumlah,
-    status: "aktif"
+    total,
+    sisa: total,
+    status: "Aktif"
   });
 
   saveDB(db);
   e.target.reset();
+  document.getElementById("angsuran").value = "";
   loadPinjaman();
-}==========
+}
+
+/* =====================
    LOAD PINJAMAN
 ===================== */
 function loadPinjaman(){
   const db = getDB();
   const tbody = document.getElementById("listPinjaman");
-  tbody.innerHTML="";
+  if(!tbody) return;
 
-  db.pinjaman.forEach((p,i)=>{
-    const a = db.anggota.find(x=>x.id===p.anggota_id);
+  tbody.innerHTML = "";
 
-    tbody.innerHTML+=`
+  (db.pinjaman || []).forEach((p,i)=>{
+    const a = (db.anggota || []).find(x=>x.id === p.anggota_id);
+
+    tbody.innerHTML += `
       <tr>
         <td>${a ? a.nama : "-"}</td>
-        <td>Rp ${p.jumlah.toLocaleString("id-ID")}</td>
+        <td>${rupiah(p.jumlah)}</td>
         <td>${p.bunga}%</td>
         <td>${p.tenor}</td>
-        <td>Rp ${p.sisa.toLocaleString("id-ID")}</td>
+        <td>${rupiah(p.sisa)}</td>
         <td>${p.status}</td>
         <td>
-          <button onclick="bayarAngsuran(${i})">💳 Bayar</button>
+          ${p.status === "Lunas"
+            ? "-"
+            : `<button onclick="bayarAngsuran(${i})">💳 Bayar</button>`
+          }
         </td>
       </tr>
     `;
@@ -115,14 +139,12 @@ function bayarAngsuran(index){
   const db = getDB();
   const p = db.pinjaman[index];
 
-  if(p.status==="Lunas"){
+  if(p.status === "Lunas"){
     alert("Pinjaman sudah lunas");
     return;
   }
 
-  const total = p.jumlah + (p.jumlah*(p.bunga/100)*p.tenor);
-  const angsuran = total / p.tenor;
-
+  const angsuran = p.total / p.tenor;
   p.sisa -= angsuran;
 
   if(p.sisa <= 0){
@@ -133,3 +155,11 @@ function bayarAngsuran(index){
   saveDB(db);
   loadPinjaman();
 }
+
+/* =====================
+   INIT
+===================== */
+document.addEventListener("DOMContentLoaded", ()=>{
+  loadAnggota();
+  loadPinjaman();
+});
