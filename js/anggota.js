@@ -1,12 +1,12 @@
 let editMode = false;
 
-/* =====================
-   LOAD DATA
-===================== */
+/* LOAD DATA */
 function loadAnggota(){
   const db = getDB();
   const tbody = document.getElementById("listAnggota");
   tbody.innerHTML = "";
+
+  if(!db.anggota) db.anggota = [];
 
   db.anggota.forEach((a, i) => {
     tbody.innerHTML += `
@@ -24,13 +24,13 @@ function loadAnggota(){
   });
 }
 
-/* =====================
-   SIMPAN / UPDATE
-===================== */
+/* SIMPAN / UPDATE */
 function simpanAnggota(e){
   e.preventDefault();
 
   const db = getDB();
+  if(!db.anggota) db.anggota = [];
+
   const id = document.getElementById("idAnggota").value;
   const nama = document.getElementById("nama").value;
   const alamat = document.getElementById("alamat").value;
@@ -38,15 +38,12 @@ function simpanAnggota(e){
 
   if(editMode){
     const idx = db.anggota.findIndex(a => a.id === id);
-    db.anggota[idx] = { id, nama, alamat, telp };
+    if(idx !== -1){
+      db.anggota[idx] = { id, nama, alamat, telp };
+    }
   }else{
     const newID = "AG" + String(db.anggota.length + 1).padStart(3,"0");
-    db.anggota.push({
-      id: newID,
-      nama,
-      alamat,
-      telp
-    });
+    db.anggota.push({ id: newID, nama, alamat, telp });
   }
 
   saveDB(db);
@@ -54,9 +51,7 @@ function simpanAnggota(e){
   loadAnggota();
 }
 
-/* =====================
-   EDIT
-===================== */
+/* EDIT */
 function editAnggota(index){
   const db = getDB();
   const a = db.anggota[index];
@@ -69,9 +64,7 @@ function editAnggota(index){
   editMode = true;
 }
 
-/* =====================
-   HAPUS
-===================== */
+/* HAPUS */
 function hapusAnggota(index){
   if(confirm("Hapus anggota ini?")){
     const db = getDB();
@@ -81,9 +74,7 @@ function hapusAnggota(index){
   }
 }
 
-/* =====================
-   RESET FORM
-===================== */
+/* RESET */
 function resetForm(){
   document.getElementById("idAnggota").value = "";
   document.getElementById("nama").value = "";
