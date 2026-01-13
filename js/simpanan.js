@@ -3,12 +3,10 @@
 ===================== */
 function loadAnggota(){
   const db = getDB();
-  if(!Array.isArray(db.anggota)) db.anggota = [];
-
   const sel = document.getElementById("anggota");
   sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
 
-  db.anggota.forEach(a => {
+  (db.anggota || []).forEach(a => {
     sel.innerHTML += `<option value="${a.id}">${a.nama}</option>`;
   });
 }
@@ -18,14 +16,11 @@ function loadAnggota(){
 ===================== */
 function loadSimpanan(){
   const db = getDB();
-  if(!Array.isArray(db.simpanan)) db.simpanan = [];
-  if(!Array.isArray(db.anggota)) db.anggota = [];
-
   const tbody = document.getElementById("listSimpanan");
   tbody.innerHTML = "";
 
-  db.simpanan.forEach((s, i) => {
-    const anggota = db.anggota.find(a => a.id === s.anggota_id);
+  (db.simpanan || []).forEach((s, i) => {
+    const anggota = (db.anggota || []).find(a => a.id === s.anggota_id);
 
     tbody.innerHTML += `
       <tr>
@@ -40,7 +35,6 @@ function loadSimpanan(){
     `;
   });
 }
-
 /* =====================
    SIMPAN
 ===================== */
