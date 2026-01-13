@@ -55,10 +55,11 @@ th{
 }
 </style>
 </head>
+
 <body>
 
 <header>
-  <h3>Data Simpanan</h3>
+  <h3>📌 Data Simpanan</h3>
   <div>
     <button onclick="location.href='dashboard.html'">⬅ Dashboard</button>
     <button onclick="logout()">Logout</button>
@@ -67,10 +68,11 @@ th{
 
 <div class="container">
 
-  <form onsubmit="simpanSimpanan(event)">
+  <form id="formSimpanan" onsubmit="simpanSimpanan(event)">
     <select id="anggota" required></select>
 
-    <select id="jenis">
+    <select id="jenis" required>
+      <option value="">-- Pilih Jenis Simpanan --</option>
       <option value="Pokok">Simpanan Pokok</option>
       <option value="Wajib">Simpanan Wajib</option>
       <option value="Sukarela">Simpanan Sukarela</option>
@@ -100,11 +102,5 @@ th{
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/simpanan.js"></script>
-<script>
-  cekLogin();
-  loadAnggota();
-  loadSimpanan();
-</script>
-
 </body>
 </html>
