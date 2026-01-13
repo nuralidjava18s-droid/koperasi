@@ -4,6 +4,8 @@
 function loadAnggota(){
   const db = getDB();
   const sel = document.getElementById("anggota");
+  if(!sel) return;
+
   sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
 
   (db.anggota || []).forEach(a => {
@@ -17,6 +19,8 @@ function loadAnggota(){
 function loadSimpanan(){
   const db = getDB();
   const tbody = document.getElementById("listSimpanan");
+  if(!tbody) return;
+
   tbody.innerHTML = "";
 
   (db.simpanan || []).forEach((s, i) => {
@@ -24,7 +28,7 @@ function loadSimpanan(){
 
     tbody.innerHTML += `
       <tr>
-        <td>${s.tanggal}</td>
+        <td>${s.tanggal || "-"}</td>
         <td>${anggota ? anggota.nama : "-"}</td>
         <td>${s.jenis}</td>
         <td>Rp ${Number(s.jumlah).toLocaleString("id-ID")}</td>
@@ -35,8 +39,9 @@ function loadSimpanan(){
     `;
   });
 }
+
 /* =====================
-   SIMPAN
+   SIMPAN SIMPANAN
 ===================== */
 function simpanSimpanan(e){
   e.preventDefault();
@@ -44,13 +49,23 @@ function simpanSimpanan(e){
   const db = getDB();
   if(!Array.isArray(db.simpanan)) db.simpanan = [];
 
-  const anggota_id = document.getElementById("anggota").value;
-  const jenis = document.getElementById("jenis").value;
-  const jumlah = Number(document.getElementById("jumlah").value);
-  const tanggal = document.getElementById("tanggal").value;
+  const anggotaEl = document.getElementById("anggota");
+  const jenisEl   = document.getElementById("jenis");
+  const jumlahEl  = document.getElementById("jumlah");
+  const tanggalEl = document.getElementById("tanggal");
+
+  const anggota_id = anggotaEl ? anggotaEl.value : "";
+  const jenis   = jenisEl ? jenisEl.value : "";
+  const jumlah  = Number(jumlahEl ? jumlahEl.value : 0);
+  const tanggal = tanggalEl ? tanggalEl.value : "";
 
   if(!anggota_id){
     alert("Pilih anggota");
+    return;
+  }
+
+  if(!jenis){
+    alert("Pilih jenis simpanan (Pokok / Wajib / Sukarela)");
     return;
   }
 
@@ -70,20 +85,32 @@ function simpanSimpanan(e){
   });
 
   saveDB(db);
-  e.target.reset();
+
+  if(e.target && e.target.reset){
+    e.target.reset();
+  }
+
   loadSimpanan();
 }
 
 /* =====================
-   HAPUS
+   HAPUS SIMPANAN
 ===================== */
 function hapusSimpanan(index){
-  if(confirm("Hapus data simpanan ini?")){
-    const db = getDB();
-    if(!Array.isArray(db.simpanan)) db.simpanan = [];
+  if(!confirm("Hapus data simpanan ini?")) return;
 
-    db.simpanan.splice(index,1);
-    saveDB(db);
-    loadSimpanan();
-  }
+  const db = getDB();
+  if(!Array.isArray(db.simpanan)) db.simpanan = [];
+
+  db.simpanan.splice(index, 1);
+  saveDB(db);
+  loadSimpanan();
 }
+
+/* =====================
+   INIT
+===================== */
+document.addEventListener("DOMContentLoaded", () => {
+  loadAnggota();
+  loadSimpanan();
+});
