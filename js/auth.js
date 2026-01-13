@@ -7,21 +7,14 @@ function login(){
   const pass = document.getElementById("password").value.trim();
   const errorBox = document.getElementById("error");
 
-  if(!user || !pass){
-    errorBox.style.display = "block";
-    errorBox.innerText = "Username & password wajib diisi";
-    return;
-  }
-
-  const db = getDB(); // dari storage.js
+  const db = getDB(); // ambil dari storage.js
 
   if(user === db.user.username && pass === db.user.password){
-    localStorage.setItem("koperasi_login", "true");
-    localStorage.setItem("koperasi_user", user);
+    localStorage.setItem("koperasi_login","true");
     window.location.href = "dashboard.html";
   }else{
+    errorBox.innerText = "Username / password salah";
     errorBox.style.display = "block";
-    errorBox.innerText = "Username atau password salah";
   }
 }
 
@@ -32,9 +25,6 @@ function cekLogin(){
 }
 
 function logout(){
-  if(confirm("Yakin ingin logout?")){
-    localStorage.removeItem("koperasi_login");
-    localStorage.removeItem("koperasi_user");
-    window.location.href = "index.html";
-  }
+  localStorage.removeItem("koperasi_login");
+  window.location.href = "index.html";
 }
