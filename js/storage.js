@@ -1,5 +1,5 @@
 /* =====================
-STORAGE KOPERASI (FINAL & FIX)
+   STORAGE KOPERASI
 ===================== */
 
 function getDB(){
@@ -20,13 +20,32 @@ function getDB(){
   return JSON.parse(db);
 }
 
-
-
+function saveDB(db){
+  localStorage.setItem("koperasi_db", JSON.stringify(db));
+}
 
 /* =====================
-HELPER (OPTIONAL)
+   LOGIN
+===================== */
+
+function cekLogin(){
+  const login = localStorage.getItem("login");
+  if(!login){
+    location.href = "login.html";
+  }
+}
+
+function logout(){
+  if(confirm("Yakin ingin logout?")){
+    localStorage.removeItem("login");
+    location.href = "login.html";
+  }
+}
+
+/* =====================
+   UTIL
 ===================== */
 
 function rupiah(n){
-return "Rp " + (Number(n)||0).toLocaleString("id-ID");
+  return "Rp " + (Number(n) || 0).toLocaleString("id-ID");
 }
