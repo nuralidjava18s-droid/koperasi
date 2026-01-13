@@ -1,30 +1,39 @@
 /* =====================
-   AUTH KOPERASI (FIX)
+STORAGE KOPERASI (FINAL & FIX)
 ===================== */
 
-function login(){
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
-  const errorBox = document.getElementById("error");
+function getDB(){
+let db = localStorage.getItem("koperasi_db");
 
-  const db = getDB(); // ← dari storage.js
+if(!db){
+const initDB = {
+user: {
+username: "admin",
+password: "1234"
+},
+anggota: [],
+simpanan: [],
+pinjaman: [],
+transaksi: [],
+kas: []
+};
 
-  if(user === db.user.username && pass === db.user.password){
-    localStorage.setItem("koperasi_login","true");
-    window.location.href = "dashboard.html";
-  }else{
-    errorBox.style.display = "block";
-    errorBox.innerText = "Username atau password salah";
-  }
+localStorage.setItem("koperasi_db", JSON.stringify(initDB));  
+return initDB;
+
 }
 
-function cekLogin(){
-  if(localStorage.getItem("koperasi_login") !== "true"){
-    window.location.href = "index.html";
-  }
+return JSON.parse(db);
 }
 
-function logout(){
-  localStorage.removeItem("koperasi_login");
-  window.location.href = "index.html";
+function saveDB(db){
+localStorage.setItem("koperasi_db", JSON.stringify(db));
+}
+
+/* =====================
+HELPER (OPTIONAL)
+===================== */
+
+function rupiah(n){
+return "Rp " + (Number(n)||0).toLocaleString("id-ID");
 }
