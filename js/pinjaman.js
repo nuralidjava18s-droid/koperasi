@@ -36,29 +36,52 @@ function hitungAngsuran(){
 /* =====================
    SIMPAN PINJAMAN
 ===================== */
+
+/* ===========/* =====================
+   SIMPAN PINJAMAN
+===================== */
 function simpanPinjaman(e){
   e.preventDefault();
+
   const db = getDB();
+  if(!Array.isArray(db.pinjaman)) db.pinjaman = [];
 
-  const pinjaman = {
-    id: "PJ" + String(db.pinjaman.length+1).padStart(3,"0"),
-    anggota_id: anggota.value,
-    jumlah: Number(jumlah.value),
-    bunga: Number(bunga.value),
-    tenor: Number(tenor.value),
-    sisa: Number(jumlah.value),
-    status: "Aktif"
-  };
+  const anggota_id = document.getElementById("anggota").value;
+  const jumlah = Number(document.getElementById("jumlah").value);
+  const tenor = Number(document.getElementById("tenor").value);
+  const tanggal = document.getElementById("tanggal").value;
 
-  db.pinjaman.push(pinjaman);
+  if(!anggota_id){
+    alert("Pilih anggota");
+    return;
+  }
+
+  if(!jumlah || jumlah <= 0){
+    alert("Jumlah pinjaman tidak valid");
+    return;
+  }
+
+  if(!tenor || tenor <= 0){
+    alert("Tenor tidak valid");
+    return;
+  }
+
+  const id = "PJ" + String(db.pinjaman.length + 1).padStart(3,"0");
+
+  db.pinjaman.push({
+    id,
+    anggota_id,
+    jumlah,
+    tenor,
+    tanggal,
+    sisa: jumlah,
+    status: "aktif"
+  });
+
   saveDB(db);
-
   e.target.reset();
-  document.getElementById("angsuran").value="";
   loadPinjaman();
-}
-
-/* =====================
+}==========
    LOAD PINJAMAN
 ===================== */
 function loadPinjaman(){
