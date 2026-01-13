@@ -3,6 +3,8 @@
 ===================== */
 function loadAnggota(){
   const db = getDB();
+  if(!Array.isArray(db.anggota)) db.anggota = [];
+
   const sel = document.getElementById("anggota");
   sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
 
@@ -16,6 +18,9 @@ function loadAnggota(){
 ===================== */
 function loadSimpanan(){
   const db = getDB();
+  if(!Array.isArray(db.simpanan)) db.simpanan = [];
+  if(!Array.isArray(db.anggota)) db.anggota = [];
+
   const tbody = document.getElementById("listSimpanan");
   tbody.innerHTML = "";
 
@@ -27,7 +32,7 @@ function loadSimpanan(){
         <td>${s.tanggal}</td>
         <td>${anggota ? anggota.nama : "-"}</td>
         <td>${s.jenis}</td>
-        <td>Rp ${s.jumlah.toLocaleString("id-ID")}</td>
+        <td>Rp ${Number(s.jumlah).toLocaleString("id-ID")}</td>
         <td>
           <button onclick="hapusSimpanan(${i})">🗑️</button>
         </td>
@@ -43,6 +48,8 @@ function simpanSimpanan(e){
   e.preventDefault();
 
   const db = getDB();
+  if(!Array.isArray(db.simpanan)) db.simpanan = [];
+
   const anggota_id = document.getElementById("anggota").value;
   const jenis = document.getElementById("jenis").value;
   const jumlah = Number(document.getElementById("jumlah").value);
@@ -50,6 +57,11 @@ function simpanSimpanan(e){
 
   if(!anggota_id){
     alert("Pilih anggota");
+    return;
+  }
+
+  if(!jumlah || jumlah <= 0){
+    alert("Jumlah tidak valid");
     return;
   }
 
@@ -74,6 +86,8 @@ function simpanSimpanan(e){
 function hapusSimpanan(index){
   if(confirm("Hapus data simpanan ini?")){
     const db = getDB();
+    if(!Array.isArray(db.simpanan)) db.simpanan = [];
+
     db.simpanan.splice(index,1);
     saveDB(db);
     loadSimpanan();
