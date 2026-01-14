@@ -44,15 +44,16 @@ function simpanAnggota(e){
       db.anggota[idx].telp = telp;
     }
   }else{
-    // TAMBAH BARU
-    db.anggota.push({
-      id: "AG" + Date.now(),
-      nama,
-      alamat,
-      telp
-    });
-  }
-
+    
+function generateIdAnggota(){
+  const db = getDB();
+  let max = 0;
+  db.anggota.forEach(a=>{
+    const n = parseInt(a.id.replace("AG",""));
+    if(n > max) max = n;
+  });
+  return "AG" + String(max + 1).padStart(3,"0");
+}
   saveDB(db);
   resetForm();
   loadDataAnggota();   // ⬅️ WAJIB
