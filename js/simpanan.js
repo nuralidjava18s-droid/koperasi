@@ -1,110 +1,116 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Simpanan</title>
+/* =====================
+   LOAD ANGGOTA
+===================== */
+function loadAnggota(){
+  const db = getDB();
+  const sel = document.getElementById("anggota");
+  if(!sel) return;
 
-<style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#f4f6f9;
-}
-header{
-  background:#1e90ff;
-  color:white;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-header button{
-  background:#ff5252;
-  border:none;
-  color:white;
-  padding:6px 10px;
-  border-radius:5px;
-}
-.container{
-  padding:20px;
-}
-form{
-  background:white;
-  padding:15px;
-  border-radius:8px;
-  margin-bottom:20px;
-}
-form select, form input{
-  width:100%;
-  padding:8px;
-  margin:5px 0;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  background:white;
-}
-th, td{
-  padding:10px;
-  border:1px solid #ddd;
-  text-align:center;
-}
-th{
-  background:#eee;
-}
-</style>
-</head>
-<body>
+  sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
 
-<header>
-  <h3>Data Simpanan</h3>
-  <div>
-    <button onclick="location.href='dashboard.html'">⬅ Dashboard</button>
-    <button onclick="logout()">Logout</button>
-  </div>
-</header>
+  (db.anggota || []).forEach(a => {
+    sel.innerHTML += `<option value="${a.id}">${a.nama}</option>`;
+  });
+}
 
-<div class="container">
+/* =====================
+   LOAD SIMPANAN
+===================== */
+function loadSimpanan(){
+  const db = getDB();
+  const tbody = document.getElementById("listSimpanan");
+  if(!tbody) return;
 
-  <form onsubmit="simpanSimpanan(event)">
-    <select id="anggota" required></select>
+  tbody.innerHTML = "";
 
-    <select id="jenis">
-      <option value="Pokok">Simpanan Pokok</option>
-      <option value="Wajib">Simpanan Wajib</option>
-      <option value="Sukarela">Simpanan Sukarela</option>
-    </select>
+  (db.simpanan || []).forEach((s, i) => {
+    const anggota = (db.anggota || []).find(a => a.id === s.anggota_id);
 
-    <input type="number" id="jumlah" placeholder="Jumlah Simpanan" required>
-    <input type="date" id="tanggal" required>
-
-    <button type="submit">💾 Simpan</button>
-  </form>
-
-  <table>
-    <thead>
+    tbody.innerHTML += `
       <tr>
-        <th>Tanggal</th>
-        <th>Anggota</th>
-        <th>Jenis</th>
-        <th>Jumlah</th>
-        <th>Aksi</th>
+        <td>${s.tanggal || "-"}</td>
+        <td>${anggota ? anggota.nama : "-"}</td>
+        <td>${s.jenis}</td>
+        <td>Rp ${Number(s.jumlah).toLocaleString("id-ID")}</td>
+        <td>
+          <button onclick="hapusSimpanan(${i})">🗑️</button>
+        </td>
       </tr>
-    </thead>
-    <tbody id="listSimpanan"></tbody>
-  </table>
+    `;
+  });
+}
 
-</div>
+/* =====================
+   SIMPAN SIMPANAN
+===================== */
+function simpanSimpanan(e){
+  e.preventDefault();
 
-<script src="js/storage.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/simpanan.js"></script>
-<script>
-  cekLogin();
+  const db = getDB();
+  if(!Array.isArray(db.simpanan)) db.simpanan = [];
+
+  const anggotaEl = document.getElementById("anggota");
+  const jenisEl   = document.getElementById("jenis");
+  const jumlahEl  = document.getElementById("jumlah");
+  const tanggalEl = document.getElementById("tanggal");
+
+  const anggota_id = anggotaEl ? anggotaEl.value : "";
+  const jenis   = jenisEl ? jenisEl.value : "";
+  const jumlah  = Number(jumlahEl ? jumlahEl.value : 0);
+  const tanggal = tanggalEl ? tanggalEl.value : "";
+
+  if(!anggota_id){
+    alert("Pilih anggota");
+    return;
+  }
+
+  if(!jenis){
+    alert("Pilih jenis simpanan (Pokok / Wajib / Sukarela)");
+    return;
+  }
+
+  if(!jumlah || jumlah <= 0){
+    alert("Jumlah tidak valid");
+    return;
+  }
+
+  const id = "SP" + String(db.simpanan.length + 1).padStart(3,"0");
+
+  db.simpanan.push({
+    id,
+    anggota_id,
+    jenis,
+    jumlah,
+    tanggal
+  });
+
+  saveDB(db);
+
+  if(e.target && e.target.reset){
+    e.target.reset();
+  }
+
+  loadSimpanan();
+}
+
+/* =====================
+   HAPUS SIMPANAN
+===================== */
+function hapusSimpanan(index){
+  if(!confirm("Hapus data simpanan ini?")) return;
+
+  const db = getDB();
+  if(!Array.isArray(db.simpanan)) db.simpanan = [];
+
+  db.simpanan.splice(index, 1);
+  saveDB(db);
+  loadSimpanan();
+}
+
+/* =====================
+   INIT
+===================== */
+document.addEventListener("DOMContentLoaded", () => {
   loadAnggota();
   loadSimpanan();
-</script>
-
-</body>
-</html>
+});
