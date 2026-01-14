@@ -8,6 +8,8 @@ function getDB(){
       user:{ username:"admin", password:"1234" },
       anggota:[],
       transaksi:[],
+      simpanan:[],
+      pinjaman:[],
       kas:[]
     };
     localStorage.setItem("koperasi_db", JSON.stringify(db));
