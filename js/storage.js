@@ -25,20 +25,19 @@ function saveDB(db){
 }
 
 /* =====================
-   LOGIN
+   AUTH
 ===================== */
 
 function cekLogin(){
-  const login = localStorage.getItem("login");
-  if(!login){
-    location.href = "login.html";
+  if(localStorage.getItem("koperasi_login") !== "true"){
+    location.href = "index.html";
   }
 }
 
 function logout(){
   if(confirm("Yakin ingin logout?")){
-    localStorage.removeItem("login");
-    location.href = "login.html";
+    localStorage.removeItem("koperasi_login");
+    location.href = "index.html";
   }
 }
 
