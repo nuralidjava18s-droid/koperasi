@@ -1,7 +1,3 @@
-/* =====================
-   AUTH KOPERASI
-===================== */
-
 function login(){
   const user = document.getElementById("username").value.trim();
   const pass = document.getElementById("password").value.trim();
@@ -10,7 +6,7 @@ function login(){
   const db = getDB();
 
   if(user === db.user.username && pass === db.user.password){
-    localStorage.setItem("koperasi_login", "true");
+    localStorage.setItem("koperasi_login","true");
     location.href = "dashboard.html";
   }else{
     errorBox.innerText = "Username / password salah";
