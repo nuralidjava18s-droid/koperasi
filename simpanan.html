@@ -55,10 +55,11 @@ th{
 }
 </style>
 </head>
+
 <body>
 
 <header>
-  <h3>Data Simpanan</h3>
+  <h3>📥 Data Simpanan</h3>
   <div>
     <button onclick="location.href='dashboard.html'">⬅ Dashboard</button>
     <button onclick="logout()">Logout</button>
@@ -66,37 +67,39 @@ th{
 </header>
 
 <div class="container">
-<form onsubmit="simpanSimpanan(event)">
-  <select id="anggota"></select>
 
-  <select id="jenis">
+<!-- FORM -->
+<form onsubmit="simpanSimpanan(event)">
+  <select id="anggota" required></select>
+
+  <select id="jenis" required>
     <option value="">-- Pilih Jenis --</option>
     <option value="Pokok">Pokok</option>
     <option value="Wajib">Wajib</option>
     <option value="Sukarela">Sukarela</option>
   </select>
 
-  <input type="number" id="jumlah">
-  <input type="date" id="tanggal">
+  <input type="number" id="jumlah" placeholder="Jumlah Simpanan" required>
+  <input type="date" id="tanggal" required>
 
-  <button type="submit">Simpan</button>
+  <button type="submit">💾 Simpan</button>
 </form>
 
+<!-- TABEL -->
 <table>
-  <tbody id="listSimpanan"></tbody>
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Anggota</th>
+      <th>Jenis</th>
+      <th>Jumlah</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="listSimpanan">
+    <!-- diisi oleh simpanan.js -->
+  </tbody>
 </table>
-  
-    <thead>
-      <tr>
-        <th>Tanggal</th>
-        <th>Anggota</th>
-        <th>Jenis</th>
-        <th>Jumlah</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="listSimpanan"></tbody>
-  </table>
 
 </div>
 
