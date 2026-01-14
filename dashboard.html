@@ -129,41 +129,6 @@
 <script>
   cekLogin();
 
-  function rupiah(n){
-    return "Rp " + (Number(n)||0).toLocaleString("id-ID");
-  }
-
-  function hitungSaldoKas(){
-    const db = getDB();
-    let kasMasuk = 0;
-    let kasKeluar = 0;
-
-    /* SIMPANAN */
-    (db.simpanan || []).forEach(s=>{
-      kasMasuk += Number(s.jumlah);
-    });
-
-    /* ANGSURAN */
-    (db.transaksi || [])
-      .filter(t=>t.jenis==="BAYAR" || t.jenis==="ANGSURAN")
-      .forEach(t=>{
-        kasMasuk += Number(t.jumlah);
-      });
-
-    /* PINJAMAN */
-    (db.pinjaman || []).forEach(p=>{
-      kasKeluar += Number(p.jumlah);
-    });
-
-    /* KAS MANUAL */
-    (db.kas || []).forEach(k=>{
-      if(k.jenis==="masuk") kasMasuk += Number(k.jumlah);
-      if(k.jenis==="keluar") kasKeluar += Number(k.jumlah);
-    });
-
-    return kasMasuk - kasKeluar;
-  }
-
   function loadDashboard(){
     document.getElementById("totalSaldo").innerText =
       rupiah(hitungSaldoKas());
