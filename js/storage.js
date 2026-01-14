@@ -12,7 +12,7 @@ function getDB(){
         password: "1234"
       },
       anggota: [],
-      simpan: [],
+      simpanan: [],
       pinjaman: [],
       transaksi: [],
       kas: []
