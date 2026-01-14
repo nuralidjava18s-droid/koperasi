@@ -66,23 +66,26 @@ th{
 </header>
 
 <div class="container">
+<form onsubmit="simpanSimpanan(event)">
+  <select id="anggota"></select>
 
-  <form onsubmit="simpanSimpanan(event)">
-    <select id="anggota" required></select>
+  <select id="jenis">
+    <option value="">-- Pilih Jenis --</option>
+    <option value="Pokok">Pokok</option>
+    <option value="Wajib">Wajib</option>
+    <option value="Sukarela">Sukarela</option>
+  </select>
 
-    <select id="jenis">
-      <option value="Pokok">Simpanan Pokok</option>
-      <option value="Wajib">Simpanan Wajib</option>
-      <option value="Sukarela">Simpanan Sukarela</option>
-    </select>
+  <input type="number" id="jumlah">
+  <input type="date" id="tanggal">
 
-    <input type="number" id="jumlah" placeholder="Jumlah Simpanan" required>
-    <input type="date" id="tanggal" required>
+  <button type="submit">Simpan</button>
+</form>
 
-    <button type="submit">💾 Simpan</button>
-  </form>
-
-  <table>
+<table>
+  <tbody id="listSimpanan"></tbody>
+</table>
+  
     <thead>
       <tr>
         <th>Tanggal</th>
