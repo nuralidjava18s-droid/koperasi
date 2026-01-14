@@ -8,7 +8,7 @@ function getDB(){
       user:{ username:"admin", password:"1234" },
       anggota:[],
       transaksi:[],
-      simpanan:[],
+      simpan:[],
       pinjaman:[],
       kas:[]
     };
