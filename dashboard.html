@@ -105,7 +105,7 @@
       <p>Simpanan anggota</p>
     </div>
 
-    <div class="card" onclick="location.href='pinjaman-angsuran.html'">
+    <div class="card" onclick="location.href='pinjaman.html'">
       <h3>🔁 Pinjaman dan bayar</h3>
       <p>Pinjaman & bayar pinjaman</p>
     </div>
@@ -129,15 +129,39 @@
 <script>
   cekLogin();
 
-  function loadDashboard(){
-    document.getElementById("totalSaldo").innerText =
-      rupiah(hitungSaldoKas());
+  function rupiah(n){
+    return "Rp " + (Number(n)||0).toLocaleString("id-ID");
   }
+
+  function loadDashboard(){
+  const db = getDB();
+  let saldo = 0;
+
+  // SIMPANAN = MASUK
+  db.simpanan.forEach(s=>{
+    saldo += Number(s.jumlah);
+  });
+
+  // ANGSURAN = MASUK
+  db.transaksi
+    .filter(t=>t.jenis==="BAYAR")
+    .forEach(t=>{
+      saldo += Number(t.jumlah);
+    });
+
+  // PINJAMAN = KELUAR
+  db.pinjaman.forEach(p=>{
+    saldo -= Number(p.jumlah);
+  });
+
+  document.getElementById("totalSaldo").innerText =
+    "Rp " + saldo.toLocaleString("id-ID");
+}
 
   function logout(){
     if(confirm("Yakin ingin logout?")){
-      localStorage.removeItem("koperasi_login");
-      location.href = "index.html";
+      localStorage.removeItem("login");
+      location.href = "login.html";
     }
   }
 
