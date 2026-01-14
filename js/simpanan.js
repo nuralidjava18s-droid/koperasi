@@ -1,20 +1,13 @@
-document.addEventListener("DOMContentLoaded", ()=>{
-  cekLogin();
-  loadAnggota();
-  loadSimpanan();
-});
-
 /* =====================
    LOAD ANGGOTA
 ===================== */
 function loadAnggota(){
   const db = getDB();
   const sel = document.getElementById("anggota");
-  if(!sel) return;
 
-  sel.innerHTML = `<option value="">-- Pilih Anggota --</option>`;
+  sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
 
-  (db.anggota || []).forEach(a=>{
+  (db.anggota || []).forEach(a => {
     sel.innerHTML += `<option value="${a.id}">${a.nama}</option>`;
   });
 }
@@ -24,17 +17,17 @@ function loadAnggota(){
 ===================== */
 function loadSimpanan(){
   const db = getDB();
-  const tbody = document.getElementById("listSimpanan");
-  if(!tbody) return;
+  if(!Array.isArray(db.simpanan)) db.simpanan = [];
 
+  const tbody = document.getElementById("listSimpanan");
   tbody.innerHTML = "";
 
-  (db.simpanan || []).forEach((s, i)=>{
+  db.simpanan.forEach((s, i) => {
     const anggota = (db.anggota || []).find(a => a.id === s.anggota_id);
 
     tbody.innerHTML += `
       <tr>
-        <td>${s.tanggal || "-"}</td>
+        <td>${s.tanggal}</td>
         <td>${anggota ? anggota.nama : "-"}</td>
         <td>${s.jenis}</td>
         <td>${rupiah(s.jumlah)}</td>
@@ -52,54 +45,52 @@ function loadSimpanan(){
 function simpanSimpanan(e){
   e.preventDefault();
 
-  const anggota = document.getElementById("anggota");
-  const jenis   = document.getElementById("jenis");
-  const jumlah  = document.getElementById("jumlah");
-  const tanggal = document.getElementById("tanggal");
+  const db = getDB();
+  if(!Array.isArray(db.simpanan)) db.simpanan = [];
 
-  if(!anggota || !jenis || !jumlah || !tanggal){
-    alert("Form tidak lengkap");
-    return;
-  }
+  const anggota_id = document.getElementById("anggota").value;
+  const jenis = document.getElementById("jenis").value;
+  const jumlah = Number(document.getElementById("jumlah").value);
+  const tanggal = document.getElementById("tanggal").value;
 
-  if(!anggota.value){
+  if(!anggota_id){
     alert("Pilih anggota");
     return;
   }
 
-  if(!jenis.value){
-    alert("Pilih jenis simpanan");
-    return;
-  }
-
-  if(Number(jumlah.value) <= 0){
+  if(!jumlah || jumlah <= 0){
     alert("Jumlah tidak valid");
     return;
   }
 
-  const db = getDB();
+  const id = "SP" + Date.now();
 
   db.simpanan.push({
-    id: "SP" + Date.now(),   // ✅ ID aman
-    anggota_id: anggota.value,
-    jenis: jenis.value,
-    jumlah: Number(jumlah.value),
-    tanggal: tanggal.value
+    id,
+    anggota_id,
+    jenis,
+    jumlah,
+    tanggal
   });
 
   saveDB(db);
+
   e.target.reset();
   loadSimpanan();
+
+  alert("Simpanan berhasil disimpan");
 }
 
 /* =====================
    HAPUS SIMPANAN
 ===================== */
 function hapusSimpanan(index){
-  if(!confirm("Hapus data simpanan ini?")) return;
+  if(confirm("Hapus data simpanan ini?")){
+    const db = getDB();
+    if(!Array.isArray(db.simpanan)) return;
 
-  const db = getDB();
-  db.simpanan.splice(index, 1);
-  saveDB(db);
-  loadSimpanan();
+    db.simpanan.splice(index, 1);
+    saveDB(db);
+    loadSimpanan();
+  }
 }
