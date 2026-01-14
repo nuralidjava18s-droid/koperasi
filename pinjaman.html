@@ -3,29 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pinjaman & Angsuran</title>
+<title>Pinjaman Koperasi</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f4f6f9;}
-header{background:#1e90ff;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-header button{background:#ff5252;border:none;color:#fff;padding:6px 12px;border-radius:5px;}
-.container{padding:20px;}
-.tabs{display:flex;gap:10px;margin-bottom:15px;}
-.tabs button{flex:1;padding:10px;border:none;border-radius:5px;background:#ddd;}
-.tabs button.active{background:#1e90ff;color:#fff;}
-.tabcontent{display:none;}
-form,table{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;}
-form input,form select{width:100%;padding:8px;margin:5px 0;}
-table{width:100%;border-collapse:collapse;}
-th,td{border:1px solid #ddd;padding:8px;text-align:center;}
-th{background:#eee;}
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
+}
+header{
+  background:#1e90ff;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header button{
+  background:#ff5252;
+  border:none;
+  color:white;
+  padding:6px 12px;
+  border-radius:5px;
+  cursor:pointer;
+}
+.container{
+  padding:20px;
+}
+form{
+  background:white;
+  padding:15px;
+  border-radius:8px;
+  margin-bottom:20px;
+}
+form input, form select{
+  width:100%;
+  padding:8px;
+  margin:6px 0;
+}
+form button{
+  width:100%;
+  padding:10px;
+  background:#1e90ff;
+  color:white;
+  border:none;
+  border-radius:5px;
+  font-size:16px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+}
+th, td{
+  padding:10px;
+  border:1px solid #ddd;
+  text-align:center;
+}
+th{
+  background:#eee;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h3>📌 Pinjaman & Angsuran</h3>
+  <h3>📌 Data Pinjaman</h3>
   <div>
     <button onclick="location.href='dashboard.html'">⬅ Dashboard</button>
     <button onclick="logout()">Logout</button>
@@ -34,212 +78,68 @@ th{background:#eee;}
 
 <div class="container">
 
-<!-- TAB -->
-<div class="tabs">
-  <button class="tablink active" onclick="openTab('pinjaman',this)">Pinjaman</button>
-  <button class="tablink" onclick="openTab('bayar',this)">Bayar Angsuran</button>
-</div>
-
-<!-- ================= PINJAMAN ================= -->
-<div id="pinjaman" class="tabcontent" style="display:block">
-
+<!-- FORM PINJAMAN -->
 <form onsubmit="simpanPinjaman(event)">
   <h4>➕ Tambah Pinjaman</h4>
 
-  <select id="anggotaPinjam" required></select>
-  <input type="number" id="jumlahPinjam" placeholder="Jumlah Pinjaman" required>
-  <input type="number" id="bungaPinjam" placeholder="Bunga (%) / bulan" required>
-  <input type="number" id="tenorPinjam" placeholder="Tenor (bulan)" required>
-  <input type="text" id="angsuranPinjam" placeholder="Estimasi Angsuran / bulan" readonly>
+  <label>Nama Anggota</label>
+  <select id="anggotaPinjam" required>
+    <option value="">-- Pilih Anggota --</option>
+  </select>
+
+  <label>Jumlah Pinjaman</label>
+  <input type="number" id="jumlahPinjam" required>
+
+  <label>Bunga (%)</label>
+  <input type="number" id="bungaPinjam" value="0">
+
+  <label>Tenor (bulan)</label>
+  <input type="number" id="tenorPinjam" required>
+
+  <label>Angsuran / bulan</label>
+  <input type="number" id="angsuran" readonly>
+
+  <label>Tanggal Pinjam</label>
+  <input type="date" id="tanggalPinjam" required>
 
   <button type="submit">💾 Simpan Pinjaman</button>
 </form>
 
+<!-- TABEL PINJAMAN -->
 <h4>📋 Daftar Pinjaman</h4>
+
 <table>
-<thead>
-<tr>
-  <th>Anggota</th>
-  <th>Total</th>
-  <th>Bunga</th>
-  <th>Tenor</th>
-  <th>Terbayar</th>
-  <th>Sisa</th>
-  <th>Status</th>
-</tr>
-</thead>
-<tbody id="listPinjaman"></tbody>
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Anggota</th>
+      <th>Pinjaman</th>
+      <th>Tenor</th>
+      <th>Angsuran</th>
+      <th>Sisa</th>
+      <th>Status</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="listPinjaman">
+    <!-- diisi JS -->
+  </tbody>
 </table>
 
 </div>
 
-<!-- ================= BAYAR ================= -->
-<div id="bayar" class="tabcontent">
-
-<form onsubmit="simpanAngsuran(event)">
-  <h4>💰 Bayar Angsuran</h4>
-
-  <select id="anggotaBayar" onchange="loadPinjamanDropdown()" required></select>
-  <select id="pinjamanBayar" required></select>
-  <input type="number" id="jumlahBayar" placeholder="Jumlah Bayar" required>
-
-  <button type="submit">💾 Simpan Angsuran</button>
-</form>
-
-<h4>📋 Riwayat Angsuran</h4>
-<table>
-<thead>
-<tr>
-  <th>Anggota</th>
-  <th>Jumlah</th>
-  <th>Tanggal</th>
-</tr>
-</thead>
-<tbody id="listBayar"></tbody>
-</table>
-
-</div>
-
-</div>
-
-<!-- ================= SCRIPT ================= -->
+<!-- SCRIPT -->
 <script src="js/storage.js"></script>
-<script src="js/auth.js"></script>
+<script src="js/pinjaman.js"></script>
 
 <script>
-cekLogin();
-
-/* TAB */
-function openTab(tab,el){
-  document.querySelectorAll(".tabcontent").forEach(t=>t.style.display="none");
-  document.querySelectorAll(".tablink").forEach(b=>b.classList.remove("active"));
-  document.getElementById(tab).style.display="block";
-  el.classList.add("active");
+/* logout aman */
+function logout(){
+  if(confirm("Logout?")){
+    localStorage.removeItem("koperasi_login");
+    location.href="index.html";
+  }
 }
-
-/* RUPIAH */
-function rupiah(n){return "Rp "+(Number(n)||0).toLocaleString("id-ID");}
-
-/* LOAD ANGGOTA */
-function loadAnggotaDropdowns(){
-  const db=getDB();
-  ["anggotaPinjam","anggotaBayar"].forEach(id=>{
-    const s=document.getElementById(id);
-    s.innerHTML=`<option value="">-- Pilih Anggota --</option>`;
-    db.anggota.forEach(a=>{
-      s.innerHTML+=`<option value="${a.id}">${a.nama}</option>`;
-    });
-  });
-}
-
-/* HITUNG ANGSURAN */
-["jumlahPinjam","bungaPinjam","tenorPinjam"].forEach(id=>{
-  document.getElementById(id).addEventListener("input",()=>{
-    const j=+jumlahPinjam.value||0;
-    const b=+bungaPinjam.value||0;
-    const t=+tenorPinjam.value||0;
-    if(j&&b&&t){
-      angsuranPinjam.value=rupiah(Math.ceil((j+(j*b*t/100))/t));
-    }else angsuranPinjam.value="";
-  });
-});
-
-/* SIMPAN PINJAMAN */
-function simpanPinjaman(e){
-  e.preventDefault();
-  const db=getDB();
-  if(!db.pinjaman) db.pinjaman=[];
-
-  const total=+jumlahPinjam.value+(+jumlahPinjam.value*+bungaPinjam.value*+tenorPinjam.value/100);
-
-  db.pinjaman.push({
-    id:"PJ"+Date.now(),
-    anggota_id:anggotaPinjam.value,
-    total,
-    sisa:total,
-    bunga:+bungaPinjam.value,
-    tenor:+tenorPinjam.value,
-    tanggal:new Date().toISOString().slice(0,10)
-  });
-
-  saveDB(db);
-  e.target.reset();
-  loadPinjaman();
-  loadPinjamanDropdown();
-  alert("Pinjaman tersimpan");
-}
-
-/* LOAD PINJAMAN */
-function loadPinjaman(){
-  const db=getDB();
-  listPinjaman.innerHTML="";
-  db.pinjaman.forEach(p=>{
-    const a=db.anggota.find(x=>x.id===p.anggota_id);
-    listPinjaman.innerHTML+=`
-    <tr>
-      <td>${a?a.nama:"-"}</td>
-      <td>${rupiah(p.total)}</td>
-      <td>${p.bunga}%</td>
-      <td>${p.tenor}</td>
-      <td>${rupiah(p.total-p.sisa)}</td>
-      <td>${rupiah(p.sisa)}</td>
-      <td style="color:${p.sisa<=0?'green':'red'}">${p.sisa<=0?'LUNAS':'BELUM'}</td>
-    </tr>`;
-  });
-}
-
-/* DROPDOWN PINJAMAN */
-function loadPinjamanDropdown(){
-  const db=getDB();
-  pinjamanBayar.innerHTML=`<option value="">-- Pilih Pinjaman --</option>`;
-  db.pinjaman.filter(p=>p.anggota_id===anggotaBayar.value && p.sisa>0)
-    .forEach(p=>{
-      pinjamanBayar.innerHTML+=`<option value="${p.id}">${rupiah(p.sisa)}</option>`;
-    });
-}
-
-/* SIMPAN ANGSURAN */
-function simpanAngsuran(e){
-  e.preventDefault();
-  const db=getDB();
-  const pin=db.pinjaman.find(p=>p.id===pinjamanBayar.value);
-  const bayar=+jumlahBayar.value;
-  pin.sisa=Math.max(0,pin.sisa-bayar);
-
-  db.transaksi.push({
-    id:"BY"+Date.now(),
-    pinjaman_id:pin.id,
-    anggota_id:pin.anggota_id,
-    jumlah:bayar,
-    tanggal:new Date().toISOString().slice(0,10)
-  });
-
-  saveDB(db);
-  e.target.reset();
-  loadPinjaman();
-  loadBayar();
-  loadPinjamanDropdown();
-}
-
-/* LOAD BAYAR */
-function loadBayar(){
-  const db=getDB();
-  listBayar.innerHTML="";
-  db.transaksi.forEach(t=>{
-    const a=db.anggota.find(x=>x.id===t.anggota_id);
-    listBayar.innerHTML+=`
-    <tr>
-      <td>${a?a.nama:"-"}</td>
-      <td>${rupiah(t.jumlah)}</td>
-      <td>${t.tanggal}</td>
-    </tr>`;
-  });
-}
-
-/* INIT */
-loadAnggotaDropdowns();
-loadPinjaman();
-loadBayar();
 </script>
 
 </body>
