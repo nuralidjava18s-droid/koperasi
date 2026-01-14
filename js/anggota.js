@@ -1,14 +1,12 @@
-let editMode = false;
-
-/* LOAD DATA */
-function loadAnggota(){
+/* =====================
+   LOAD DATA ANGGOTA (TABLE)
+===================== */
+function loadDataAnggota(){
   const db = getDB();
   const tbody = document.getElementById("listAnggota");
   tbody.innerHTML = "";
 
-  if(!db.anggota) db.anggota = [];
-
-  db.anggota.forEach((a, i) => {
+  (db.anggota || []).forEach((a, i)=>{
     tbody.innerHTML += `
       <tr>
         <td>${a.id}</td>
@@ -24,34 +22,45 @@ function loadAnggota(){
   });
 }
 
-/* SIMPAN / UPDATE */
+/* =====================
+   SIMPAN / UPDATE
+===================== */
 function simpanAnggota(e){
   e.preventDefault();
-
   const db = getDB();
-  if(!db.anggota) db.anggota = [];
+  if(!Array.isArray(db.anggota)) db.anggota = [];
 
-  const id = document.getElementById("idAnggota").value;
+  const idEl = document.getElementById("idAnggota");
   const nama = document.getElementById("nama").value;
   const alamat = document.getElementById("alamat").value;
   const telp = document.getElementById("telp").value;
 
-  if(editMode){
-    const idx = db.anggota.findIndex(a => a.id === id);
-    if(idx !== -1){
-      db.anggota[idx] = { id, nama, alamat, telp };
+  if(idEl.value){
+    // UPDATE
+    const idx = db.anggota.findIndex(a=>a.id===idEl.value);
+    if(idx>-1){
+      db.anggota[idx].nama = nama;
+      db.anggota[idx].alamat = alamat;
+      db.anggota[idx].telp = telp;
     }
   }else{
-    const newID = "AG" + String(db.anggota.length + 1).padStart(3,"0");
-    db.anggota.push({ id: newID, nama, alamat, telp });
+    // TAMBAH BARU
+    db.anggota.push({
+      id: "AG" + Date.now(),
+      nama,
+      alamat,
+      telp
+    });
   }
 
   saveDB(db);
   resetForm();
-  loadAnggota();
+  loadDataAnggota();   // ⬅️ WAJIB
 }
 
-/* EDIT */
+/* =====================
+   EDIT
+===================== */
 function editAnggota(index){
   const db = getDB();
   const a = db.anggota[index];
@@ -60,25 +69,24 @@ function editAnggota(index){
   document.getElementById("nama").value = a.nama;
   document.getElementById("alamat").value = a.alamat;
   document.getElementById("telp").value = a.telp;
-
-  editMode = true;
 }
 
-/* HAPUS */
+/* =====================
+   HAPUS
+===================== */
 function hapusAnggota(index){
   if(confirm("Hapus anggota ini?")){
     const db = getDB();
     db.anggota.splice(index,1);
     saveDB(db);
-    loadAnggota();
+    loadDataAnggota();
   }
 }
 
-/* RESET */
+/* =====================
+   RESET
+===================== */
 function resetForm(){
   document.getElementById("idAnggota").value = "";
-  document.getElementById("nama").value = "";
-  document.getElementById("alamat").value = "";
-  document.getElementById("telp").value = "";
-  editMode = false;
+  document.querySelector("form").reset();
 }
