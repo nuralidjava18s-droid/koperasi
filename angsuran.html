@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bayar Angsuran</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
+}
+header{
+  background:#1e90ff;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header button{
+  background:#ff5252;
+  border:none;
+  color:white;
+  padding:6px 12px;
+  border-radius:5px;
+  cursor:pointer;
+}
+.container{
+  padding:20px;
+}
+form{
+  background:white;
+  padding:15px;
+  border-radius:8px;
+  margin-bottom:20px;
+}
+form select, form input{
+  width:100%;
+  padding:8px;
+  margin:6px 0;
+}
+form button{
+  width:100%;
+  padding:10px;
+  background:#1e90ff;
+  color:white;
+  border:none;
+  border-radius:5px;
+  font-size:16px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+}
+th, td{
+  padding:10px;
+  border:1px solid #ddd;
+  text-align:center;
+}
+th{
+  background:#eee;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h3>💰 Bayar Angsuran</h3>
+  <div>
+    <button onclick="location.href='dashboard.html'">⬅ Dashboard</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- FORM BAYAR -->
+<form onsubmit="simpanAngsuran(event)">
+  <h4>➕ Pembayaran Angsuran</h4>
+
+  <label>Nama Anggota</label>
+  <select id="anggotaBayar" onchange="loadPinjaman()" required>
+    <option value="">-- Pilih Anggota --</option>
+  </select>
+
+  <label>Pilih Pinjaman</label>
+  <select id="pinjamanBayar" required>
+    <option value="">-- Pilih Pinjaman --</option>
+  </select>
+
+  <label>Jumlah Bayar</label>
+  <input type="number" id="jumlahBayar" required>
+
+  <label>Tanggal Bayar</label>
+  <input type="date" id="tanggalBayar" required>
+
+  <button type="submit">💾 Simpan Pembayaran</button>
+</form>
+
+<!-- TABEL -->
+<h4>📋 Riwayat Angsuran</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Anggota</th>
+      <th>Pinjaman</th>
+      <th>Bayar</th>
+      <th>Sisa</th>
+    </tr>
+  </thead>
+  <tbody id="listBayar"></tbody>
+</table>
+
+</div>
+
+<script src="js/storage.js"></script>
+
+<script>
+/* =====================
+   LOAD ANGGOTA
+===================== */
+function loadAnggota(){
+  const db = getDB();
+  const sel = document.getElementById("anggotaBayar");
+  sel.innerHTML = "<option value=''>-- Pilih Anggota --</option>";
+
+  (db.anggota || []).forEach(a=>{
+    sel.innerHTML += `<option value="${a.id}">${a.nama}</option>`;
+  });
+}
+
+/* =====================
+   LOAD PINJAMAN
+===================== */
+function loadPinjaman(){
+  const db = getDB();
+  const anggota_id = document.getElementById("anggotaBayar").value;
+  const sel = document.getElementById("pinjamanBayar");
+
+  sel.innerHTML = "<option value=''>-- Pilih Pinjaman --</option>";
+
+  (db.pinjaman || [])
+    .filter(p => p.anggota_id === anggota_id && p.sisa > 0)
+    .forEach(p=>{
+      sel.innerHTML += `
+        <option value="${p.id}">
+          ${rupiah(p.jumlah)} | Sisa ${rupiah(p.sisa)}
+        </option>
+      `;
+    });
+}
+
+/* =====================
+   SIMPAN ANGSURAN
+===================== */
+function simpanAngsuran(e){
+  e.preventDefault();
+
+  const db = getDB();
+  if(!Array.isArray(db.transaksi)) db.transaksi = [];
+
+  const anggota_id = document.getElementById("anggotaBayar").value;
+  const pinjaman_id = document.getElementById("pinjamanBayar").value;
+  const jumlah = Number(document.getElementById("jumlahBayar").value);
+  const tanggal = document.getElementById("tanggalBayar").value;
+
+  const pinjaman = db.pinjaman.find(p => p.id === pinjaman_id);
+  if(!pinjaman) return alert("Pinjaman tidak ditemukan");
+
+  if(jumlah <= 0) return alert("Jumlah tidak valid");
+  if(jumlah > pinjaman.sisa) return alert("Bayar melebihi sisa pinjaman");
+
+  pinjaman.sisa -= jumlah;
+
+  db.transaksi.push({
+    id: "BY" + Date.now(),
+    anggota_id,
+    pinjaman_id,
+    jumlah,
+    tanggal,
+    jenis: "ANGSURAN"
+  });
+
+  saveDB(db);
+
+  e.target.reset();
+  loadPinjaman();
+  loadBayar();
+
+  alert("Angsuran berhasil disimpan");
+}
+
+/* =====================
+   LOAD TABEL
+===================== */
+function loadBayar(){
+  const db = getDB();
+  const tbody = document.getElementById("listBayar");
+  tbody.innerHTML = "";
+
+  (db.transaksi || [])
+    .filter(t => t.jenis === "ANGSURAN")
+    .forEach(t=>{
+      const anggota = db.anggota.find(a => a.id === t.anggota_id);
+      const pinjaman = db.pinjaman.find(p => p.id === t.pinjaman_id);
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${t.tanggal}</td>
+          <td>${anggota ? anggota.nama : "-"}</td>
+          <td>${rupiah(pinjaman ? pinjaman.jumlah : 0)}</td>
+          <td>${rupiah(t.jumlah)}</td>
+          <td>${rupiah(pinjaman ? pinjaman.sisa : 0)}</td>
+        </tr>
+      `;
+    });
+}
+
+/* =====================
+   LOGOUT
+===================== */
+function logout(){
+  if(confirm("Logout?")){
+    localStorage.removeItem("koperasi_login");
+    location.href="index.html";
+  }
+}
+
+/* =====================
+   INIT
+===================== */
+loadAnggota();
+loadBayar();
+</script>
+
+</body>
+</html>
