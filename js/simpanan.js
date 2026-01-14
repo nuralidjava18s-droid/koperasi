@@ -1,18 +1,8 @@
-cekLogin();
-
-/* =====================
-   UTIL
-===================== */
-function rupiah(n){
-  return "Rp " + Number(n || 0).toLocaleString("id-ID");
-}
-
-function logout(){
-  if(confirm("Yakin ingin logout?")){
-    localStorage.removeItem("login");
-    location.href = "login.html";
-  }
-}
+document.addEventListener("DOMContentLoaded", ()=>{
+  cekLogin();
+  loadAnggota();
+  loadSimpanan();
+});
 
 /* =====================
    LOAD ANGGOTA
@@ -40,11 +30,11 @@ function loadSimpanan(){
   tbody.innerHTML = "";
 
   (db.simpanan || []).forEach((s, i)=>{
-    const anggota = (db.anggota || []).find(a=>a.id===s.anggota_id);
+    const anggota = (db.anggota || []).find(a => a.id === s.anggota_id);
 
     tbody.innerHTML += `
       <tr>
-        <td>${s.tanggal}</td>
+        <td>${s.tanggal || "-"}</td>
         <td>${anggota ? anggota.nama : "-"}</td>
         <td>${s.jenis}</td>
         <td>${rupiah(s.jumlah)}</td>
@@ -62,41 +52,43 @@ function loadSimpanan(){
 function simpanSimpanan(e){
   e.preventDefault();
 
-  const db = getDB();
-  if(!Array.isArray(db.simpanan)) db.simpanan = [];
+  const anggota = document.getElementById("anggota");
+  const jenis   = document.getElementById("jenis");
+  const jumlah  = document.getElementById("jumlah");
+  const tanggal = document.getElementById("tanggal");
 
-  const anggota_id = document.getElementById("anggota").value;
-  const jenis      = document.getElementById("jenis").value;
-  const jumlah     = Number(document.getElementById("jumlah").value);
-  const tanggal    = document.getElementById("tanggal").value;
+  if(!anggota || !jenis || !jumlah || !tanggal){
+    alert("Form tidak lengkap");
+    return;
+  }
 
-  if(!anggota_id){
+  if(!anggota.value){
     alert("Pilih anggota");
     return;
   }
 
-  if(!jenis){
+  if(!jenis.value){
     alert("Pilih jenis simpanan");
     return;
   }
 
-  if(!jumlah || jumlah <= 0){
+  if(Number(jumlah.value) <= 0){
     alert("Jumlah tidak valid");
     return;
   }
 
-  const id = "SP" + String(db.simpanan.length + 1).padStart(3,"0");
+  const db = getDB();
 
   db.simpanan.push({
-    id,
-    anggota_id,
-    jenis,
-    jumlah,
-    tanggal
+    id: "SP" + Date.now(),   // ✅ ID aman
+    anggota_id: anggota.value,
+    jenis: jenis.value,
+    jumlah: Number(jumlah.value),
+    tanggal: tanggal.value
   });
 
   saveDB(db);
-  document.getElementById("formSimpanan").reset();
+  e.target.reset();
   loadSimpanan();
 }
 
@@ -107,17 +99,7 @@ function hapusSimpanan(index){
   if(!confirm("Hapus data simpanan ini?")) return;
 
   const db = getDB();
-  if(!Array.isArray(db.simpanan)) db.simpanan = [];
-
   db.simpanan.splice(index, 1);
   saveDB(db);
   loadSimpanan();
 }
-
-/* =====================
-   INIT
-===================== */
-document.addEventListener("DOMContentLoaded", ()=>{
-  loadAnggota();
-  loadSimpanan();
-});
