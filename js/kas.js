@@ -1,5 +1,5 @@
 function rupiah(n){
-  return "Rp " + (Number(n) || 0).toLocaleString("id-ID");
+  return "Rp " + (Number(n)||0).toLocaleString("id-ID");
 }
 
 function loadKas(){
@@ -11,13 +11,13 @@ function loadKas(){
   let kasKeluar = 0;
   tbody.innerHTML = "";
 
-  /* ===== SIMPANAN (MASUK) ===== */
+  /* ===== SIMPANAN ===== */
   (db.simpanan || []).forEach(s=>{
-    const jml = Number(s.jumlah || 0);
+    const jml = Number(s.jumlah||0);
     kasMasuk += jml;
     tbody.innerHTML += `
       <tr>
-        <td>${s.tanggal || "-"}</td>
+        <td>${s.tanggal||"-"}</td>
         <td>Simpanan (${s.jenis})</td>
         <td>${rupiah(jml)}</td>
         <td>-</td>
@@ -25,51 +25,32 @@ function loadKas(){
     `;
   });
 
-  /* ===== ANGSURAN PINJAMAN (MASUK) ===== */
+  /* ===== BAYAR PINJAMAN ===== */
   (db.transaksi || [])
-    .filter(t => t.jenis === "BAYAR")
+    .filter(t=>t.jenis==="BAYAR")
     .forEach(t=>{
-      const jml = Number(t.jumlah || 0);
+      const jml = Number(t.jumlah||0);
       kasMasuk += jml;
       tbody.innerHTML += `
         <tr>
-          <td>${t.tanggal || "-"}</td>
-          <td>Angsuran Pinjaman</td>
+          <td>${t.tanggal||"-"}</td>
+          <td>Bayar Pinjaman</td>
           <td>${rupiah(jml)}</td>
           <td>-</td>
         </tr>
       `;
     });
 
-  /* ===== PINJAMAN (KELUAR) ===== */
+  /* ===== PINJAMAN ===== */
   (db.pinjaman || []).forEach(p=>{
-    const jml = Number(p.jumlah || 0);
+    const jml = Number(p.jumlah||0);
     kasKeluar += jml;
     tbody.innerHTML += `
       <tr>
-        <td>${p.tanggal || "-"}</td>
+        <td>${p.tanggal||"-"}</td>
         <td>Pencairan Pinjaman</td>
         <td>-</td>
         <td>${rupiah(jml)}</td>
-      </tr>
-    `;
-  });
-
-  /* ===== KAS MANUAL ===== */
-  (db.kas || []).forEach(k=>{
-    const jml = Number(k.jumlah || 0);
-    if(k.jenis === "masuk"){
-      kasMasuk += jml;
-    }else if(k.jenis === "keluar"){
-      kasKeluar += jml;
-    }
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${k.tanggal || "-"}</td>
-        <td>${k.keterangan || "Kas Manual"}</td>
-        <td>${k.jenis === "masuk" ? rupiah(jml) : "-"}</td>
-        <td>${k.jenis === "keluar" ? rupiah(jml) : "-"}</td>
       </tr>
     `;
   });
