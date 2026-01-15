@@ -1,16 +1,47 @@
-/* ======================
-   DATA ANGGOTA
+<script>
+/* =====================
+   STORAGE
 ===================== */
+function getDB(){
+  let db = localStorage.getItem("koperasi_db");
+  if(!db){
+    db = {
+      user:{username:"ali",password:"1234"},
+      anggota:[],
+      simpanan:[],
+      pinjaman:[],
+      transaksi:[],
+      kas:[]
+    };
+    localStorage.setItem("koperasi_db",JSON.stringify(db));
+  }
+  return JSON.parse(db);
+}
+function saveDB(db){
+  localStorage.setItem("koperasi_db",JSON.stringify(db));
+}
 
+/* =====================
+   ANGGOTA
+===================== */
 let editIndex = null;
 
-function loadDataAnggota(){
+function loadAnggota(){
   const db = getDB();
   const tbody = document.getElementById("listAnggota");
 
+  console.log("DATA ANGGOTA:", db.anggota);
+
+  if(!tbody){
+    alert("tbody listAnggota tidak ditemukan");
+    return;
+  }
+
   if(db.anggota.length === 0){
     tbody.innerHTML =
-      `<tr><td colspan="5">Belum ada data anggota</td></tr>`;
+      `<tr><td colspan="5" style="text-align:center;color:#777">
+        Belum ada anggota
+      </td></tr>`;
     return;
   }
 
@@ -20,7 +51,7 @@ function loadDataAnggota(){
       <td>${a.nama}</td>
       <td>${a.alamat}</td>
       <td>${a.telp}</td>
-      <td class="action">
+      <td>
         <button onclick="editAnggota(${i})">✏️</button>
         <button onclick="hapusAnggota(${i})">🗑️</button>
       </td>
@@ -28,65 +59,58 @@ function loadDataAnggota(){
   `).join("");
 }
 
-/* =====================
-   SIMPAN / UPDATE
-===================== */
 function simpanAnggota(e){
   e.preventDefault();
 
   const db = getDB();
 
   const data = {
-    nama: nama.value,
-    alamat: alamat.value,
-    telp: telp.value
+    nama: document.getElementById("nama").value.trim(),
+    alamat: document.getElementById("alamat").value.trim(),
+    telp: document.getElementById("telp").value.trim()
   };
 
+  if(!data.nama || !data.alamat || !data.telp){
+    alert("Semua field wajib diisi");
+    return;
+  }
+
   if(editIndex === null){
-    // tambah
     db.anggota.push(data);
   }else{
-    // update
     db.anggota[editIndex] = data;
   }
 
   saveDB(db);
   resetForm();
-  loadDataAnggota();
+  loadAnggota();
 }
 
-/* =====================
-   EDIT
-===================== */
-function editAnggota(index){
-  const db = getDB();
-  const a = db.anggota[index];
-
-  nama.value   = a.nama;
-  alamat.value= a.alamat;
-  telp.value  = a.telp;
-
-  editIndex = index;
+function editAnggota(i){
+  const a = getDB().anggota[i];
+  document.getElementById("nama").value = a.nama;
+  document.getElementById("alamat").value = a.alamat;
+  document.getElementById("telp").value = a.telp;
+  editIndex = i;
 }
 
-/* =====================
-   HAPUS
-===================== */
-function hapusAnggota(index){
+function hapusAnggota(i){
   if(!confirm("Hapus anggota ini?")) return;
-
   const db = getDB();
-  db.anggota.splice(index,1);
+  db.anggota.splice(i,1);
   saveDB(db);
-  loadDataAnggota();
+  loadAnggota();
+}
+
+function resetForm(){
+  document.getElementById("nama").value="";
+  document.getElementById("alamat").value="";
+  document.getElementById("telp").value="";
+  editIndex=null;
 }
 
 /* =====================
-   RESET FORM
+   INIT
 ===================== */
-function resetForm(){
-  nama.value = "";
-  alamat.value = "";
-  telp.value = "";
-  editIndex = null;
-}
+document.addEventListener("DOMContentLoaded", loadAnggota);
+</script>
