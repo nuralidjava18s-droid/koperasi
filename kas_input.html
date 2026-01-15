@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input Kas Manual</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f4f6f9}
+header{background:#1e90ff;color:#fff;padding:15px;text-align:center}
+.container{padding:15px}
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:6px;
+}
+input,select,button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+button{
+  background:#1e90ff;
+  border:none;
+  color:white;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>INPUT KAS MANUAL</header>
+
+<div class="container">
+<div class="card">
+
+  <label>Jenis Kas</label>
+  <select id="jenis">
+    <option value="masuk">Kas Masuk</option>
+    <option value="keluar">Kas Keluar</option>
+  </select>
+
+  <label>Jumlah</label>
+  <input type="number" id="jumlah" placeholder="Jumlah">
+
+  <label>Keterangan</label>
+  <input id="keterangan" placeholder="Contoh: Biaya ATK">
+
+  <label>Tanggal</label>
+  <input type="date" id="tanggal">
+
+  <button onclick="simpanKas()">Simpan Kas</button>
+
+</div>
+</div>
+
+<script>
+/* =====================
+   STORAGE
+===================== */
+function getDB(){
+  let db = localStorage.getItem("koperasi_db");
+  if(!db){
+    db = {
+      user:{username:"ali",password:"1234"},
+      anggota:[],
+      simpanan:[],
+      pinjaman:[],
+      transaksi:[],
+      kas:[]
+    };
+    localStorage.setItem("koperasi_db",JSON.stringify(db));
+  }
+  return JSON.parse(db);
+}
+function saveDB(db){
+  localStorage.setItem("koperasi_db",JSON.stringify(db));
+}
+
+/* =====================
+   SIMPAN KAS
+===================== */
+function simpanKas(){
+  if(!jumlah.value || !tanggal.value){
+    alert("Jumlah & tanggal wajib diisi");
+    return;
+  }
+
+  const db = getDB();
+
+  db.kas.push({
+    jenis: jenis.value,
+    jumlah: Number(jumlah.value),
+    keterangan: keterangan.value || "-",
+    tanggal: tanggal.value
+  });
+
+  saveDB(db);
+
+  alert("Kas berhasil disimpan");
+
+  jumlah.value="";
+  keterangan.value="";
+  tanggal.value="";
+}
+</script>
+
+</body>
+</html>
