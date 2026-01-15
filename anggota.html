@@ -52,7 +52,6 @@ table{
 th, td{
   padding:10px;
   border:1px solid #ddd;
-  text-align:center;
 }
 th{
   background:#eee;
@@ -60,8 +59,13 @@ th{
 .action button{
   margin:2px;
 }
+.empty{
+  text-align:center;
+  color:#777;
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -74,38 +78,140 @@ th{
 
 <div class="container">
 
-  <form onsubmit="simpanAnggota(event)">
-    <input type="hidden" id="idAnggota">
+<!-- FORM INPUT -->
+<form onsubmit="simpanAnggota(event)">
+  <h4>Input / Edit Anggota</h4>
+  <input type="hidden" id="editIndex">
 
-    <input type="text" id="nama" placeholder="Nama Anggota" required>
-    <input type="text" id="alamat" placeholder="Alamat" required>
-    <input type="text" id="telp" placeholder="No. Telp" required>
+  <input type="text" id="nama" placeholder="Nama Anggota" required>
+  <input type="text" id="alamat" placeholder="Alamat" required>
+  <input type="text" id="telp" placeholder="No. Telp" required>
 
-    <button type="submit">💾 Simpan</button>
-    <button type="button" onclick="resetForm()">Batal</button>
-  </form>
+  <button type="submit">💾 Simpan</button>
+  <button type="button" onclick="resetForm()">Batal</button>
+</form>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nama</th>
-        <th>Alamat</th>
-        <th>Telp</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="listAnggota"></tbody>
-  </table>
+<!-- LIST -->
+<table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Nama</th>
+      <th>Alamat</th>
+      <th>Telp</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="listAnggota"></tbody>
+</table>
 
 </div>
 
-<script src="js/storage.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/anggota.js"></script>
 <script>
-  cekLogin();
-  loadDataAnggota();
+/* =====================
+   STORAGE
+===================== */
+function getDB(){
+  let db = localStorage.getItem("koperasi_db");
+  if(!db){
+    db = {
+      user:{username:"ali",password:"1234"},
+      anggota:[],
+      simpanan:[],
+      pinjaman:[],
+      transaksi:[],
+      kas:[]
+    };
+    localStorage.setItem("koperasi_db",JSON.stringify(db));
+  }
+  return JSON.parse(db);
+}
+function saveDB(db){
+  localStorage.setItem("koperasi_db",JSON.stringify(db));
+}
+
+/* =====================
+   AUTH (SIMPLE)
+===================== */
+function logout(){
+  localStorage.removeItem("login");
+  location.href="index.html";
+}
+
+/* =====================
+   ANGGOTA
+===================== */
+let editIndex = null;
+
+function loadAnggota(){
+  const db = getDB();
+  const tbody = document.getElementById("listAnggota");
+
+  if(db.anggota.length===0){
+    tbody.innerHTML =
+      `<tr><td colspan="5" class="empty">Belum ada anggota</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = db.anggota.map((a,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${a.nama}</td>
+      <td>${a.alamat}</td>
+      <td>${a.telp}</td>
+      <td class="action">
+        <button onclick="editAnggota(${i})">✏️</button>
+        <button onclick="hapusAnggota(${i})">🗑️</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function simpanAnggota(e){
+  e.preventDefault();
+  const db = getDB();
+
+  const data = {
+    nama: nama.value,
+    alamat: alamat.value,
+    telp: telp.value
+  };
+
+  if(editIndex===null){
+    db.anggota.push(data);
+  }else{
+    db.anggota[editIndex] = data;
+  }
+
+  saveDB(db);
+  resetForm();
+  loadAnggota();
+}
+
+function editAnggota(i){
+  const a = getDB().anggota[i];
+  nama.value = a.nama;
+  alamat.value = a.alamat;
+  telp.value = a.telp;
+  editIndex = i;
+}
+
+function hapusAnggota(i){
+  if(!confirm("Hapus anggota ini?")) return;
+  const db = getDB();
+  db.anggota.splice(i,1);
+  saveDB(db);
+  loadAnggota();
+}
+
+function resetForm(){
+  nama.value="";
+  alamat.value="";
+  telp.value="";
+  editIndex=null;
+}
+
+loadAnggota();
 </script>
 
 </body>
