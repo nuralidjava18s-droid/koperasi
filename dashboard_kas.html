@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Kas</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f4f6f9}
+header{background:#1e90ff;color:#fff;padding:15px;text-align:center}
+.container{padding:15px}
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:6px;
+  margin-bottom:15px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:10px;
+}
+.box{
+  padding:15px;
+  border-radius:6px;
+  color:white;
+}
+.masuk{background:#2ecc71}
+.keluar{background:#e74c3c}
+.saldo{background:#34495e}
+
+select,button{
+  padding:8px;
+  margin-right:5px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  border:1px solid #ddd;
+  padding:8px;
+}
+th{background:#eee}
+</style>
+</head>
+
+<body>
+<header>DASHBOARD KAS KOPERASI</header>
+
+<div class="container">
+
+<!-- FILTER -->
+<div class="card">
+  <b>Filter Bulan:</b><br><br>
+  <select id="bulan"></select>
+  <select id="tahun"></select>
+  <button onclick="loadDashboard()">Tampilkan</button>
+</div>
+
+<!-- RINGKASAN -->
+<div class="grid">
+  <div class="box masuk">
+    <h3>Kas Masuk</h3>
+    <h2 id="totalMasuk">Rp 0</h2>
+  </div>
+  <div class="box keluar">
+    <h3>Kas Keluar</h3>
+    <h2 id="totalKeluar">Rp 0</h2>
+  </div>
+  <div class="box saldo">
+    <h3>Saldo</h3>
+    <h2 id="saldoKas">Rp 0</h2>
+  </div>
+</div>
+
+<!-- TABEL -->
+<div class="card">
+<h3>Riwayat Kas</h3>
+<table>
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Sumber</th>
+<th>Masuk</th>
+<th>Keluar</th>
+</tr>
+</thead>
+<tbody id="listKas"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+/* =====================
+   STORAGE
+===================== */
+function getDB(){
+  let db = localStorage.getItem("koperasi_db");
+  if(!db){
+    db = {
+      user:{username:"ali",password:"1234"},
+      anggota:[],
+      simpanan:[],
+      pinjaman:[],
+      transaksi:[],
+      kas:[]
+    };
+    localStorage.setItem("koperasi_db",JSON.stringify(db));
+  }
+  return JSON.parse(db);
+}
+function rupiah(n){
+  return "Rp " + (Number(n)||0).toLocaleString("id-ID");
+}
+
+/* =====================
+   INIT FILTER
+===================== */
+function initFilter(){
+  const now = new Date();
+
+  bulan.innerHTML = [
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ].map((b,i)=>`<option value="${i}">${b}</option>`).join("");
+
+  let y="";
+  for(let i=now.getFullYear()-5;i<=now.getFullYear()+1;i++){
+    y+=`<option>${i}</option>`;
+  }
+  tahun.innerHTML = y;
+
+  bulan.value = now.getMonth();
+  tahun.value = now.getFullYear();
+}
+
+/* =====================
+   DASHBOARD
+===================== */
+function loadDashboard(){
+  const db = getDB();
+  const m = Number(bulan.value);
+  const y = Number(tahun.value);
+
+  let data=[];
+  let masuk=0, keluar=0;
+
+  function cek(tgl){
+    const d = new Date(tgl);
+    return d.getMonth()===m && d.getFullYear()===y;
+  }
+
+  // SIMPANAN
+  db.simpanan.forEach(s=>{
+    if(cek(s.tanggal)){
+      masuk+=Number(s.jumlah);
+      data.push({
+        tanggal:s.tanggal,
+        sumber:"Simpanan "+s.jenis,
+        masuk:s.jumlah, keluar:0
+      });
+    }
+  });
+
+  // BAYAR PINJAMAN
+  db.transaksi.filter(t=>t.jenis==="bayar").forEach(t=>{
+    if(cek(t.tanggal)){
+      masuk+=Number(t.jumlah);
+      data.push({
+        tanggal:t.tanggal,
+        sumber:"Bayar Pinjaman",
+        masuk:t.jumlah, keluar:0
+      });
+    }
+  });
+
+  // PINJAMAN
+  db.pinjaman.forEach(p=>{
+    if(cek(p.tanggal)){
+      keluar+=Number(p.jumlah);
+      data.push({
+        tanggal:p.tanggal,
+        sumber:"Pinjaman",
+        masuk:0, keluar:p.jumlah
+      });
+    }
+  });
+
+  // KAS MANUAL
+  db.kas.forEach(k=>{
+    if(cek(k.tanggal)){
+      if(k.jenis==="masuk") masuk+=k.jumlah;
+      else keluar+=k.jumlah;
+
+      data.push({
+        tanggal:k.tanggal,
+        sumber:k.keterangan,
+        masuk:k.jenis==="masuk"?k.jumlah:0,
+        keluar:k.jenis==="keluar"?k.jumlah:0
+      });
+    }
+  });
+
+  data.sort((a,b)=>new Date(a.tanggal)-new Date(b.tanggal));
+
+  listKas.innerHTML = data.map(d=>`
+    <tr>
+      <td>${d.tanggal}</td>
+      <td>${d.sumber}</td>
+      <td>${d.masuk?rupiah(d.masuk):""}</td>
+      <td>${d.keluar?rupiah(d.keluar):""}</td>
+    </tr>
+  `).join("");
+
+  totalMasuk.innerText = rupiah(masuk);
+  totalKeluar.innerText = rupiah(keluar);
+  saldoKas.innerText = rupiah(masuk-keluar);
+}
+
+initFilter();
+loadDashboard();
+</script>
+
+</body>
+</html>
