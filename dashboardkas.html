@@ -6,43 +6,85 @@
 <title>Dashboard Kas</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f4f6f9}
-header{background:#1e90ff;color:#fff;padding:15px;text-align:center}
-.container{padding:15px}
-.card{
-  background:#fff;
-  padding:15px;
-  border-radius:6px;
-  margin-bottom:15px;
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
+  font-size:14px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:10px;
-}
-.box{
-  padding:15px;
-  border-radius:6px;
+header{
+  background:#1e90ff;
   color:white;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
 }
-.masuk{background:#2ecc71}
-.keluar{background:#e74c3c}
-.saldo{background:#34495e}
+.container{
+  padding:12px;
+}
+.card{
+  background:white;
+  padding:12px;
+  border-radius:6px;
+  margin-bottom:12px;
+}
 
+/* FILTER */
 select,button{
   padding:8px;
-  margin-right:5px;
+  width:100%;
+  margin-bottom:6px;
 }
 
+/* NERACA */
+.neraca-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.neraca-box{
+  border:1px solid #ddd;
+  padding:10px;
+  text-align:center;
+}
+.neraca-box h4{
+  margin:0;
+  font-size:14px;
+}
+.neraca-box small{
+  color:#777;
+}
+.neraca-box h2{
+  margin:8px 0 0;
+  font-size:16px;
+}
+
+.neraca-saldo{
+  margin-top:10px;
+  padding:10px;
+  text-align:center;
+  background:#1e90ff;
+  color:white;
+  border-radius:4px;
+}
+.neraca-saldo small{
+  font-size:12px;
+}
+
+/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
 }
 th,td{
   border:1px solid #ddd;
-  padding:8px;
+  padding:6px;
 }
-th{background:#eee}
+th{
+  background:#eee;
+}
+td:nth-child(3){color:green}
+td:nth-child(4){color:red}
 </style>
 </head>
 
@@ -53,28 +95,36 @@ th{background:#eee}
 
 <!-- FILTER -->
 <div class="card">
-  <b>Filter Bulan:</b><br><br>
+  <b>Filter:</b><br><br>
+
   <select id="bulan"></select>
   <select id="tahun"></select>
+  <select id="filterAnggota"></select>
+
   <button onclick="loadDashboard()">Tampilkan</button>
 </div>
 
 <!-- RINGKASAN -->
-<div class="grid">
-  <div class="box masuk">
-    <h3>Kas Masuk</h3>
-    <h2 id="totalMasuk">Rp 0</h2>
+<div class="card neraca">
+  <div class="neraca-grid">
+    <div class="neraca-box">
+      <h4>AKTIVA</h4>
+      <small>Kas Masuk</small>
+      <h2 id="totalMasuk">Rp 0</h2>
+    </div>
+
+    <div class="neraca-box">
+      <h4>PASIVA</h4>
+      <small>Kas Keluar</small>
+      <h2 id="totalKeluar">Rp 0</h2>
+    </div>
   </div>
-  <div class="box keluar">
-    <h3>Kas Keluar</h3>
-    <h2 id="totalKeluar">Rp 0</h2>
-  </div>
-  <div class="box saldo">
-    <h3>Saldo</h3>
+
+  <div class="neraca-saldo">
+    <small>SALDO AKHIR KAS</small>
     <h2 id="saldoKas">Rp 0</h2>
   </div>
 </div>
-
 <!-- TABEL -->
 <div class="card">
 <h3>Riwayat Kas</h3>
@@ -140,26 +190,46 @@ function initFilter(){
 /* =====================
    DASHBOARD
 ===================== */
+  function initFilterAnggota(){
+  const db = getDB();
+
+  let opt = `<option value="all">Semua Anggota</option>`;
+
+  db.anggota.forEach(a=>{
+    opt += `<option value="${a.nama}">${a.nama}</option>`;
+  });
+
+  opt += `<option value="umum">Kas Umum</option>`;
+
+  filterAnggota.innerHTML = opt;
+}
 function loadDashboard(){
   const db = getDB();
   const m = Number(bulan.value);
   const y = Number(tahun.value);
+  const fa = filterAnggota.value;
 
   let data=[];
   let masuk=0, keluar=0;
 
-  function cek(tgl){
+  function cekTanggal(tgl){
     const d = new Date(tgl);
     return d.getMonth()===m && d.getFullYear()===y;
   }
 
+  function cekAnggota(nama){
+    if(fa==="all") return true;
+    if(fa==="umum") return !nama;
+    return nama===fa;
+  }
+
   // SIMPANAN
   db.simpanan.forEach(s=>{
-    if(cek(s.tanggal)){
+    if(cekTanggal(s.tanggal) && cekAnggota(s.anggota)){
       masuk+=Number(s.jumlah);
       data.push({
         tanggal:s.tanggal,
-        sumber:"Simpanan "+s.jenis,
+        sumber:`Simpanan ${s.jenis} (${s.anggota})`,
         masuk:s.jumlah, keluar:0
       });
     }
@@ -167,11 +237,11 @@ function loadDashboard(){
 
   // BAYAR PINJAMAN
   db.transaksi.filter(t=>t.jenis==="bayar").forEach(t=>{
-    if(cek(t.tanggal)){
+    if(cekTanggal(t.tanggal) && cekAnggota(t.anggota)){
       masuk+=Number(t.jumlah);
       data.push({
         tanggal:t.tanggal,
-        sumber:"Bayar Pinjaman",
+        sumber:`Bayar Pinjaman (${t.anggota})`,
         masuk:t.jumlah, keluar:0
       });
     }
@@ -179,11 +249,11 @@ function loadDashboard(){
 
   // PINJAMAN
   db.pinjaman.forEach(p=>{
-    if(cek(p.tanggal)){
+    if(cekTanggal(p.tanggal) && cekAnggota(p.anggota)){
       keluar+=Number(p.jumlah);
       data.push({
         tanggal:p.tanggal,
-        sumber:"Pinjaman",
+        sumber:`Pinjaman (${p.anggota})`,
         masuk:0, keluar:p.jumlah
       });
     }
@@ -191,16 +261,18 @@ function loadDashboard(){
 
   // KAS MANUAL
   db.kas.forEach(k=>{
-    if(cek(k.tanggal)){
-      if(k.jenis==="masuk") masuk+=k.jumlah;
-      else keluar+=k.jumlah;
+    if(cekTanggal(k.tanggal)){
+      if(fa==="umum" || fa==="all"){
+        if(k.jenis==="masuk") masuk+=k.jumlah;
+        else keluar+=k.jumlah;
 
-      data.push({
-        tanggal:k.tanggal,
-        sumber:k.keterangan,
-        masuk:k.jenis==="masuk"?k.jumlah:0,
-        keluar:k.jenis==="keluar"?k.jumlah:0
-      });
+        data.push({
+          tanggal:k.tanggal,
+          sumber:k.keterangan,
+          masuk:k.jenis==="masuk"?k.jumlah:0,
+          keluar:k.jenis==="keluar"?k.jumlah:0
+        });
+      }
     }
   });
 
