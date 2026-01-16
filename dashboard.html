@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Koperasi</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#f4f6f9;
+    }
+
+    header{
+      background:#1e90ff;
+      color:white;
+      padding:15px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    header h2{ margin:0; }
+
+    header button{
+      background:#ff5252;
+      border:none;
+      color:white;
+      padding:8px 14px;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    .container{ padding:20px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:15px;
+    }
+
+    .card{
+      background:white;
+      padding:20px;
+      border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.1);
+      cursor:pointer;
+      transition:.2s;
+      text-align:center;
+    }
+
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 6px 14px rgba(0,0,0,.15);
+    }
+
+    .card h3{ margin:10px 0 5px; }
+    .card p{ margin:0; color:#555; font-size:14px; }
+
+    .saldo{
+      background:#1e90ff;
+      color:white;
+      cursor:default;
+    }
+
+    .saldo p{
+      color:white;
+      font-size:20px;
+      font-weight:bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h2>Dashboard Koperasi</h2>
+  <button onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+  <div class="grid">
+
+    <!-- TOTAL SALDO -->
+    <div class="card saldo">
+      <h3>💰 Total Saldo</h3>
+      <p id="totalSaldo">Rp 0</p>
+    </div>
+    <div class="card" onclick="location.href='kas.html'">
+      <h3>💰 Kas</h3>
+      <p>Rekap kas masuk & keluar</p>
+    </div>
+
+    <div class="card" onclick="location.href='anggota.html'">
+      <h3>👤 Anggota</h3>
+      <p>Data anggota koperasi</p>
+    </div>
+
+    
+
+    <div class="card" onclick="location.href='simpanan.html'">
+      <h3>💾 Simpanan</h3>
+      <p>Simpanan anggota</p>
+    </div>
+
+    <div class="card" onclick="location.href='pinjaman.html'">
+      <h3>🔁 Pinjaman dan bayar</h3>
+      <p>Pinjaman & bayar pinjaman</p>
+    </div>
+    
+     
+    
+
+    <div class="card" onclick="location.href='lap_anggota.html'">
+      <h3>📊 Laporan</h3>
+      <p>Rekap & export</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- SCRIPT -->
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/kas.js"></script>
+
+<script>
+  cekLogin();
+
+  function rupiah(n){
+    return "Rp " + (Number(n)||0).toLocaleString("id-ID");
+  }
+
+  function loadDashboard(){
+  const db = getDB();
+  let saldo = 0;
+
+  // SIMPANAN = MASUK
+  db.simpanan.forEach(s=>{
+    saldo += Number(s.jumlah);
+  });
+
+  // ANGSURAN = MASUK
+  db.transaksi
+    .filter(t=>t.jenis==="BAYAR")
+    .forEach(t=>{
+      saldo += Number(t.jumlah);
+    });
+
+  // PINJAMAN = KELUAR
+  db.pinjaman.forEach(p=>{
+    saldo -= Number(p.jumlah);
+  });
+
+  document.getElementById("totalSaldo").innerText =
+    "Rp " + saldo.toLocaleString("id-ID");
+}
+
+  function logout(){
+    if(confirm("Yakin ingin logout?")){
+      localStorage.removeItem("login");
+      location.href = "login.html";
+    }
+  }
+
+  loadDashboard();
+</script>
+
+</body>
+</html>
