@@ -1,13 +1,41 @@
 function rupiah(n){ 
   return "Rp " + Number(n).toLocaleString("id-ID"); 
 }
+function simpanKas(){
+  const tgl = document.getElementById("tglKas").value;
+  const ket = document.getElementById("ketKas").value;
+  const jenis = document.getElementById("jenisKas").value;
+  const jumlah = document.getElementById("jumlahKas").value;
 
+  if(!tgl || !ket || !jumlah){
+    alert("Lengkapi data!");
+    return;
+  }
+
+  const db = getDB();
+
+  db.kas.push({
+    tanggal: tgl,
+    keterangan: ket,
+    jenis: jenis,   // MASUK / KELUAR
+    jumlah: Number(jumlah)
+  });
+
+  saveDB(db);
+  loadKas();
+
+  // reset form
+  document.getElementById("tglKas").value = "";
+  document.getElementById("ketKas").value = "";
+  document.getElementById("jumlahKas").value = "";
+}
 function loadKas(){
   const db = getDB();
   const tbody = document.getElementById("listKas");
   let kasMasuk = 0;
   let kasKeluar = 0;
   tbody.innerHTML = "";
+  
   /* ===== SIMPANAN (MASUK) ===== */
   db.simpanan.forEach(s=>{
     kasMasuk += Number(s.jumlah);
@@ -20,6 +48,30 @@ function loadKas(){
       </tr>
     `;
   });
+  /* ===== KAS MANUAL ===== */
+db.kas.forEach(k=>{
+  if(k.jenis === "MASUK"){
+    kasMasuk += Number(k.jumlah);
+    tbody.innerHTML += `
+      <tr>
+        <td>${k.tanggal}</td>
+        <td>${k.keterangan}</td>
+        <td>${rupiah(k.jumlah)}</td>
+        <td>-</td>
+      </tr>
+    `;
+  } else {
+    kasKeluar += Number(k.jumlah);
+    tbody.innerHTML += `
+      <tr>
+        <td>${k.tanggal}</td>
+        <td>${k.keterangan}</td>
+        <td>-</td>
+        <td>${rupiah(k.jumlah)}</td>
+      </tr>
+    `;
+  }
+});
   /* ===== ANGSURAN (MASUK) ===== */
   db.transaksi
     .filter(t=>t.jenis==="BAYAR")
