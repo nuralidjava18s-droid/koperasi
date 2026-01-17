@@ -8,7 +8,8 @@ function simpanKas(){
   const jumlah = document.getElementById("jumlahKas").value;
 
   if(!tgl || !ket || !jumlah){
-    alert("Lengkapi data!");
+    alert("Lengkapi data!";
+    
     return;
   }
 
