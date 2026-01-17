@@ -7,7 +7,7 @@ function getDB(){
   if(!db){
     const initDB = {
       user: {
-        username: "admin",
+        username: "Ali",
         password: "1234"
       },
       anggota: [],
