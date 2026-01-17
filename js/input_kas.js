@@ -1,3 +1,4 @@
+let editIndex = null;
 function rupiah(n){
   return "Rp " + Number(n).toLocaleString("id-ID");
 }
@@ -47,33 +48,53 @@ function loadKas(){
         <td>${rupiah(p.jumlah)}</td>
       </tr>`;
   });
-
+  
   /* KAS MANUAL */
-  db.kas.forEach(k=>{
-    if(k.jenis==="MASUK"){
-      kasMasuk += k.jumlah;
-      tbody.innerHTML += `
-        <tr>
-          <td>${k.tanggal}</td>
-          <td>${k.keterangan}</td>
-          <td>${rupiah(k.jumlah)}</td>
-          <td>-</td>
-        </tr>`;
-    }else{
-      kasKeluar += k.jumlah;
-      tbody.innerHTML += `
-        <tr>
-          <td>${k.tanggal}</td>
-          <td>${k.keterangan}</td>
-          <td>-</td>
-          <td>${rupiah(k.jumlah)}</td>
-        </tr>`;
-    }
-  });
-
+db.kas.forEach((k, i)=>{
+  if(k.jenis==="MASUK"){
+    kasMasuk += k.jumlah;
+    tbody.innerHTML += `
+      <tr>
+        <td>${k.tanggal}</td>
+        <td>${k.keterangan}</td>
+        <td>${rupiah(k.jumlah)}</td>
+        <td>-</td>
+        <td>
+          <button onclick="editKas(${i})">✏️</button>
+          <button onclick="hapusKas(${i})">🗑️</button>
+        </td>
+      </tr>`;
+  }else{
+    kasKeluar += k.jumlah;
+    tbody.innerHTML += `
+      <tr>
+        <td>${k.tanggal}</td>
+        <td>${k.keterangan}</td>
+        <td>-</td>
+        <td>${rupiah(k.jumlah)}</td>
+        <td>
+          <button onclick="editKas(${i})">✏️</button>
+          <button onclick="hapusKas(${i})">🗑️</button>
+        </td>
+      </tr>`;
+  }
+});
+  
   document.getElementById("kasMasuk").innerText = rupiah(kasMasuk);
   document.getElementById("kasKeluar").innerText = rupiah(kasKeluar);
   document.getElementById("saldoKas").innerText = rupiah(kasMasuk - kasKeluar);
+}
+/* FUNGSI EDIT */
+function editKas(index){
+  const db = getDB();
+  const k = db.kas[index];
+
+  tglKas.value = k.tanggal;
+  ketKas.value = k.keterangan;
+  jenisKas.value = k.jenis;
+  jumlahKas.value = k.jumlah;
+
+  editIndex = index;
 }
 
 /* SIMPAN KAS */
@@ -89,10 +110,28 @@ function simpanKas(){
   }
 
   const db = getDB();
-  db.kas.push({ tanggal:tgl, keterangan:ket, jenis, jumlah });
+
+  if(editIndex === null){
+    // TAMBAH
+    db.kas.push({ tanggal:tgl, keterangan:ket, jenis, jumlah });
+  }else{
+    // EDIT
+    db.kas[editIndex] = { tanggal:tgl, keterangan:ket, jenis, jumlah };
+    editIndex = null;
+  }
+
   saveDB(db);
 
   tglKas.value = ketKas.value = jumlahKas.value = "";
+  loadKas();
+}
+/* FUNGSI HAPUS*/
+function hapusKas(index){
+  if(!confirm("Hapus data kas ini?")) return;
+
+  const db = getDB();
+  db.kas.splice(index,1);
+  saveDB(db);
   loadKas();
 }
 
