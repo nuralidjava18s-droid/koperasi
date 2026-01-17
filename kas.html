@@ -67,10 +67,30 @@ th{background:#eee}
     <div>Saldo Kas<br><span id="saldoKas">Rp 0</span></div>
   </div>
 
-  <div class="box">
+  
     <h4>📋 Detail Kas</h4>
+    <div class="box">
+  <h4>➕ Input Kas Manual</h4>
+
+  <label>Tanggal</label><br>
+  <input type="date" id="tglKas"><br><br>
+
+  <label>Keterangan</label><br>
+  <input type="text" id="ketKas" placeholder="Contoh: Biaya listrik"><br><br>
+
+  <label>Jenis</label><br>
+  <select id="jenisKas">
+    <option value="MASUK">Kas Masuk</option>
+    <option value="KELUAR">Kas Keluar</option>
+  </select><br><br>
+
+  <label>Jumlah</label><br>
+  <input type="number" id="jumlahKas"><br><br>
+
+  <button onclick="simpanKas()">💾 Simpan</button>
+</div>
     <table>
-      <thead>
+      <thea>
         <tr>
           <th>Tanggal</th>
           <th>Keterangan</th>
