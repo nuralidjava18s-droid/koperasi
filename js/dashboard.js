@@ -1,42 +1,43 @@
 function rupiah(n){
-  return "Rp " + (Number(n) || 0).toLocaleString("id-ID");
+  return "Rp " + Number(n).toLocaleString("id-ID");
 }
 
-function hitungTotalSaldo(){
+function loadSaldoDashboard(){
   const db = getDB();
-  let saldo = 0;
 
-  /* ===== KAS MANUAL ===== */
-  if(db.kas){
-    db.kas.forEach(k=>{
-      if(k.jenis === "masuk") saldo += k.jumlah;
-      if(k.jenis === "keluar") saldo -= k.jumlah;
-    });
-  }
+  let masuk = 0;
+  let keluar = 0;
 
-  /* ===== SIMPANAN (MASUK) ===== */
+  // SIMPANAN
   db.simpanan.forEach(s=>{
-    saldo += Number(s.jumlah);
+    masuk += Number(s.jumlah);
   });
 
-  /* ===== ANGSURAN (MASUK) ===== */
+  // ANGSURAN
   db.transaksi
-    .filter(t => t.jenis === "BAYAR")
+    .filter(t=>t.jenis==="BAYAR")
     .forEach(t=>{
-      saldo += Number(t.jumlah);
+      masuk += Number(t.jumlah);
     });
 
-  /* ===== PINJAMAN (KELUAR) ===== */
+  // PINJAMAN
   db.pinjaman.forEach(p=>{
-    saldo -= Number(p.jumlah);
+    keluar += Number(p.jumlah);
   });
 
-  return saldo;
+  // KAS MANUAL
+  db.kas.forEach(k=>{
+    if(k.jenis==="MASUK"){
+      masuk += Number(k.jumlah);
+    }else{
+      keluar += Number(k.jumlah);
+    }
+  });
+
+  const saldo = masuk - keluar;
+
+  document.getElementById("saldoKasDashboard").innerText = rupiah(saldo);
 }
 
-function loadDashboard(){
-  const el = document.getElementById("totalSaldo");
-  if(!el) return;
-
-  el.innerText = rupiah(hitungTotalSaldo());
-}
+// AUTO LOAD
+document.addEventListener("DOMContentLoaded", loadSaldoDashboard);
