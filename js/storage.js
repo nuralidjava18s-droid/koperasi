@@ -27,3 +27,8 @@ function getDB(){
 function saveDB(db){
   localStorage.setItem("koperasi_db", JSON.stringify(db));
 }
+
+function logout(){
+  localStorage.removeItem("login");
+  location.href = "index.html";
+}
