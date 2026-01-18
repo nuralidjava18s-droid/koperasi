@@ -6,21 +6,130 @@
 <title>Laporan Pinjaman Per Anggota</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f4f6f9;}
-header{background:#1e90ff;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-header button{background:#ff5252;border:none;color:white;padding:6px 10px;border-radius:5px;cursor:pointer;}
-.container{padding:20px;}
-.box{background:white;padding:15px;border-radius:8px;margin-bottom:15px;}
-select{width:100%;padding:8px;margin:5px 0;}
-table{width:100%;border-collapse:collapse;}
-th,td{border:1px solid #ddd;padding:8px;text-align:center;}
-th{background:#eee;}
-.in{color:green;}
-.out{color:red;}
-.total{font-weight:bold;margin-top:10px;}
-.status-lunas{color:green;font-weight:bold;}
-.status-belum{color:red;font-weight:bold;}
-button.export{background:#1e90ff;margin-top:5px;}
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
+  font-size:14px;
+}
+
+/* HEADER */
+header{
+  background:#1e90ff;
+  color:white;
+  padding:12px 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h3{
+  margin:0;
+  font-size:16px;
+}
+
+header button{
+  background:#ff5252;
+  border:none;
+  color:white;
+  padding:7px 12px;
+  border-radius:6px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+/* CONTAINER */
+.container{
+  padding:15px;
+}
+
+/* BOX / CARD */
+.box{
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+  box-shadow:0 3px 8px rgba(0,0,0,.08);
+}
+
+/* FORM */
+label{
+  font-weight:bold;
+  display:block;
+  margin-bottom:5px;
+}
+
+select{
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+/* EXPORT BUTTON GROUP */
+.export-group{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+button.export{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* WARNA TOMBOL */
+button.pdf{
+  background:#1e90ff;
+  color:white;
+}
+
+button.wa{
+  background:#25d366;
+  color:white;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+th,td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+
+th{
+  background:#f1f1f1;
+}
+
+.in{color:green;font-weight:bold;}
+.out{color:red;font-weight:bold;}
+
+/* TOTAL */
+.total{
+  margin-top:15px;
+  font-weight:bold;
+  line-height:1.6;
+}
+
+.status-lunas{color:green;}
+.status-belum{color:red;}
+
+/* HP KECIL */
+@media(max-width:480px){
+  header h3{font-size:15px;}
+}
 </style>
 
 <!-- JSPDF -->
@@ -43,9 +152,11 @@ button.export{background:#1e90ff;margin-top:5px;}
     <select id="pilihAnggota" onchange="loadLaporan()">
       <option value="">-- Pilih Nama --</option>
     </select>
-    <button class="export" onclick="exportPDF()">📄 Export PDF</button>
-    <button class="export" onclick="exportWA()">📲 Export ke WhatsApp</button>
-  </div>
+    <div class="export-group">
+  <button class="export pdf" onclick="exportPDF()">📄 Export PDF</button>
+  <button class="export wa" onclick="exportWA()">📲 WhatsApp</button>
+</div>
+      </div>
 
   <!-- TABEL LAPORAN -->
   <div class="box">
