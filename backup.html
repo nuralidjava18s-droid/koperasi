@@ -1,57 +1,85 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Backup & Restore</title>
-  
-<style>
- 
-  body{ margin:0; font-family:Arial, sans-serif; 
-    background:#f4f6f9; }
-  
-  header{ background:#1e90ff; color:white; 
-    padding:10px; display:flex;
-    justify-content:space-between; 
-    align-items:center; }
-  
-  header h2{ font-size:18px; 
-    margin:0; }
-  header button{ background:#ff5252; 
-    border:none; color:white; padding:5px 10px;
-    border-radius:5px; font-size:14px; }
-  
-  button{ padding:10px 15px;
-    margin:5px; cursor:pointer; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backup & Restore</title>
 
-  body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#f4f6f9;
-}
-  header{
-  background:#1e90ff;
-  color:white;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#f4f6f9;
+      font-size:14px;
+    }
 
-</style>
+    header{
+      background:#1e90ff;
+      color:white;
+      padding:12px 15px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    header h2{
+      margin:0;
+      font-size:18px;
+    }
+
+    header button{
+      background:#ff5252;
+      border:none;
+      color:white;
+      padding:8px 14px;
+      border-radius:6px;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    .container{
+      padding:20px;
+      text-align:center;
+    }
+
+    button{
+      padding:12px 18px;
+      margin:8px 0;
+      font-size:15px;
+      border:none;
+      border-radius:6px;
+      background:#1e90ff;
+      color:white;
+      cursor:pointer;
+    }
+
+    input[type="file"]{
+      margin-top:10px;
+      font-size:14px;
+    }
+
+    hr{
+      margin:20px 0;
+    }
+  </style>
 </head>
+
 <body>
+
 <header>
   <h2>Backup & Restore Data</h2>
-  <div>
-    <button onclick="location.href='dashboard.html'">Dashboard</button>
-   </div>
+  <button onclick="location.href='dashboard.html'">Dashboard</button>
 </header>
-  
-<button onclick="backup()">⬇️ Backup Data</button>
-<hr>
-<input type="file" id="fileRestore">
-<br><br>
-<button onclick="restore()">⬆️ Restore Data</button>
+
+<div class="container">
+  <button onclick="backup()">⬇️ Backup Data</button>
+
+  <hr>
+
+  <input type="file" id="fileRestore">
+  <br><br>
+  <button onclick="restore()">⬆️ Restore Data</button>
+</div>
 
 <script src="js/storage.js"></script>
 <script src="js/backup.js"></script>
