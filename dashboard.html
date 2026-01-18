@@ -193,14 +193,10 @@ header h3 {
     <button onclick="logout()">Logout</button>
   </div>
 </header>
-
-
-<div class="container">
+  <div class="container">
   <div class="grid">
 
     <!-- TOTAL SALDO -->
-    
-    
     <div class="summary" style="display:flex; gap:12px;">
   
   <div class="box" style="background:#e8f5e9; flex:1;">
@@ -219,10 +215,11 @@ header h3 {
   </div>
 
 </div>
-<div class="card" onclick="location.href='input_kas.html'">
+    <div class="card" onclick="location.href='input_kas.html'">
       <h3>💰 Input Kas</h3>
       <p>Input kas masuk & keluar</p>
-</div>
+      
+    </div>
     <div class="card" onclick="location.href='anggota.html'">
       <h3>👤 Anggota</h3>
       <p>Data anggota koperasi</p>
@@ -243,31 +240,27 @@ header h3 {
       <p>Pinjaman & bayar pinjaman</p>
     </div>
     
-     
-    
-
     <div class="card" onclick="location.href='lap_anggota.html'">
-      <h3>📊 Laporan</h3>
+      <h3>📊 Laporan anggota</h3>
       <p>Rekap & export</p>
     </div>
     
+    <div class="card" onclick="location.href='laporan.html'">
+      <h3>📊 Laporan pdf</h3>
+      <p>kirim laporan pdf</p>
+    </div>
     
-
-    <button onclick="exportPDFGabungan()">📄 Export Laporan Lengkap</button>
   </div>
-  <div id="pdfPreview" style="display:none;margin-top:20px">
-  <iframe id="pdfFrame" style="width:100%;height:500px;border:1px solid #ccc"></iframe>
-</div>
-</div>
-
-
+    <div id="pdfPreview" style="display:none;margin-top:20px">
+      <iframe id="pdfFrame" style="width:100%;height:500px;border:1px solid #ccc"></iframe>
+    </div>
+  </div>
 <script>
   cekLogin();
 
   function rupiah(n){
     return "Rp " + (Number(n)||0).toLocaleString("id-ID");
   }
-
   function loadDashboard(){
   const db = getDB();
   let saldo = 0;
