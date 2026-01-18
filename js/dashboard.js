@@ -15,7 +15,7 @@ function loadSaldoDashboard(){
 
   // ANGSURAN
   db.transaksi
-    .filter(t=>t.jenis==="BAYAR")
+    .filter(t=>t.jenis === "BAYAR")
     .forEach(t=>{
       masuk += Number(t.jumlah);
     });
@@ -27,17 +27,16 @@ function loadSaldoDashboard(){
 
   // KAS MANUAL
   db.kas.forEach(k=>{
-    if(k.jenis==="MASUK"){
+    if(k.jenis === "MASUK"){
       masuk += Number(k.jumlah);
     }else{
       keluar += Number(k.jumlah);
     }
   });
 
-  const saldo = masuk - keluar;
-
-  document.getElementById("saldoKasDashboard").innerText = rupiah(saldo);
+  document.getElementById("kasMasukDashboard").innerText  = rupiah(masuk);
+  document.getElementById("kasKeluarDashboard").innerText = rupiah(keluar);
+  document.getElementById("saldoKasDashboard").innerText  = rupiah(masuk - keluar);
 }
 
-// AUTO LOAD
 document.addEventListener("DOMContentLoaded", loadSaldoDashboard);

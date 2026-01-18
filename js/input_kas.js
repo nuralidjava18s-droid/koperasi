@@ -1,3 +1,6 @@
+let totalKasMasuk = 0;
+let totalKasKeluar = 0;
+let totalSaldoKas = 0;
 let editIndex = null;
 function rupiah(n){
   return "Rp " + Number(n).toLocaleString("id-ID");
@@ -79,10 +82,14 @@ db.kas.forEach((k, i)=>{
       </tr>`;
   }
 });
+  totalKasMasuk = kasMasuk;
+totalKasKeluar = kasKeluar;
+totalSaldoKas = kasMasuk - kasKeluar;
+
+document.getElementById("kasMasuk").innerText = rupiah(totalKasMasuk);
+document.getElementById("kasKeluar").innerText = rupiah(totalKasKeluar);
+document.getElementById("saldoKas").innerText = rupiah(totalSaldoKas);
   
-  document.getElementById("kasMasuk").innerText = rupiah(kasMasuk);
-  document.getElementById("kasKeluar").innerText = rupiah(kasKeluar);
-  document.getElementById("saldoKas").innerText = rupiah(kasMasuk - kasKeluar);
 }
 /* FUNGSI EDIT */
 function editKas(index){
@@ -140,27 +147,49 @@ function exportPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  doc.text("Rekap Kas",14,15);
-  doc.text(`Kas Masuk: ${kasMasuk.innerText}`,14,25);
-  doc.text(`Kas Keluar: ${kasKeluar.innerText}`,14,32);
-  doc.text(`Saldo: ${saldoKas.innerText}`,14,39);
+  const today = new Date().toLocaleDateString("id-ID");
 
-  const data=[];
+  // JUDUL
+  doc.setFontSize(14);
+  doc.text("REKAP KAS KOPERASI", 105, 15, { align: "center" });
+
+  doc.setFontSize(10);
+  doc.text("Koperasi Simpan Pinjam", 105, 22, { align: "center" });
+  doc.text(`Tanggal Cetak : ${today}`, 14, 30);
+
+  // RINGKASAN
+  doc.text(`Kas Masuk  : ${rupiah(totalKasMasuk)}`, 14, 40);
+  doc.text(`Kas Keluar : ${rupiah(totalKasKeluar)}`, 14, 47);
+  doc.text(`Saldo Akhir: ${rupiah(totalSaldoKas)}`, 14, 54);
+
+  // DATA TABEL
+  const data = [];
   document.querySelectorAll("#listKas tr").forEach(tr=>{
-    const row=[];
-    tr.querySelectorAll("td").forEach(td=>row.push(td.innerText));
-    data.push(row);
+    const td = tr.querySelectorAll("td");
+    data.push([
+      td[0].innerText,
+      td[1].innerText,
+      td[2].innerText,
+      td[3].innerText
+    ]);
   });
 
   doc.autoTable({
-    startY:45,
-    head:[["Tanggal","Keterangan","Masuk","Keluar"]],
-    body:data
+    startY: 62,
+    head: [["Tanggal","Keterangan","Masuk","Keluar"]],
+    body: data,
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [30,144,255] }
   });
 
-  doc.save("rekap_kas.pdf");
-}
+  // TANDA TANGAN
+  let y = doc.lastAutoTable.finalY + 15;
+  doc.text("Mengetahui,", 150, y);
+  doc.text("Bendahara", 150, y + 7);
+  doc.text("( .................... )", 135, y + 25);
 
+  doc.save("rekap_kas_koperasi.pdf");
+}
 /* EXPORT WA */
 function exportWA(){
   let text = `Rekap Kas\nKas Masuk: ${kasMasuk.innerText}\nKas Keluar: ${kasKeluar.innerText}\nSaldo: ${saldoKas.innerText}\n\n`;

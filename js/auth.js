@@ -1,8 +1,11 @@
-/* =====================
-   AUTH KOPERASI
-===================== */
+/* =========================
+   AUTH KOPERASI - FINAL
+   Anti BACK / Anti Jebol
+========================= */
 
-// LOGIN
+/* =========================
+   LOGIN
+========================= */
 function login(){
   const user = document.getElementById("username").value.trim();
   const pass = document.getElementById("password").value.trim();
@@ -14,31 +17,55 @@ function login(){
     return;
   }
 
-  const data = getDB();
+  const db = getDB();
 
-  if(user === data.user.username && pass === data.user.password){
-    localStorage.setItem("koperasi_login", "true");
-    localStorage.setItem("koperasi_user", user);
+  if(user === db.user.username && pass === db.user.password){
+    localStorage.setItem("login", "true");
+    localStorage.setItem("login_user", user);
 
-    window.location.href = "dashboard.html";
+    // hapus history login
+    window.location.replace("dashboard.html");
   }else{
     errorBox.style.display = "block";
     errorBox.innerText = "Username atau password salah";
   }
 }
 
-// CEK LOGIN (dipakai di semua halaman)
+/* =========================
+   CEK LOGIN (WAJIB DI SEMUA HALAMAN)
+========================= */
 function cekLogin(){
-  if(localStorage.getItem("koperasi_login") !== "true"){
-    window.location.href = "index.html";
+  if(localStorage.getItem("login") !== "true"){
+    window.location.replace("login.html");
+  }
+
+  // anti tombol BACK Android
+  history.pushState(null, null, location.href);
+  window.onpopstate = function(){
+    history.go(1);
+  };
+}
+
+/* =========================
+   LOGOUT
+========================= */
+function logout(){
+  if(confirm("Yakin ingin logout?")){
+    localStorage.removeItem("login");
+    localStorage.removeItem("login_user");
+
+    // hapus history agar BACK tidak bisa
+    window.location.replace("login.html");
   }
 }
 
-// LOGOUT
-function logout(){
-  if(confirm("Yakin ingin logout?")){
-    localStorage.removeItem("koperasi_login");
-    localStorage.removeItem("koperasi_user");
-    window.location.href = "index.html";
+/* =========================
+   PROTEKSI REFRESH / CACHE
+========================= */
+window.addEventListener("pageshow", function(e){
+  if(e.persisted){
+    if(localStorage.getItem("login") !== "true"){
+      window.location.replace("login.html");
+    }
   }
-}
+});
