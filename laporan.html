@@ -47,6 +47,16 @@ iframe{
   height:500px;
   border:1px solid #ccc;
 }
+  select{
+  width:100%;
+  padding:8px;
+  margin-bottom:10px;
+  border-radius:6px;
+}
+label{
+  font-size:13px;
+  font-weight:bold;
+}
 </style>
 </head>
 
@@ -58,13 +68,27 @@ iframe{
 </header>
 
 <div class="container">
+<label>Anggota</label>
+<select id="filterAnggota">
+  <option value="">Semua Anggota</option>
+</select>
 
+<label>Status Pinjaman</label>
+<select id="filterStatus">
+  <option value="">Semua</option>
+  <option value="AKTIF">Belum Lunas</option>
+  <option value="LUNAS">Lunas</option>
+</select>
+
+<button onclick="exportPinjamanFilterPDF()">
+  📄 Export Pinjaman (Filter)
+</button>
   <button class="btn-kas" onclick="exportKasPDF()">📄 Laporan Kas</button>
   <button class="btn-pinjaman" onclick="exportPinjamanPDF()">📄 Laporan Pinjaman</button>
-  <button class="btn-full" onclick="exportGabunganPDF()">📄 Laporan Lengkap</button>
-
-  
-<div id="pdfPreview">
+  <button class="btn-full" onclick="exportPDFGabungan()">📄 Laporan Lengkap</button>
+  <button class="btn-pinjaman" onclick="exportPinjamanFilterPDF()">
+  📄 Export Pinjaman (Filter)</button>
+  <div id="pdfPreview">
   <h4>Preview PDF</h4>
   <iframe id="pdfFrame"></iframe>
 
@@ -99,9 +123,10 @@ iframe{
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/export_laporan.js"></script>
-<script>
-cekLogin();
-</script>
 
+  <script>
+  cekLogin();
+  loadFilterAnggota();
+  </script>
 </body>
 </html>
