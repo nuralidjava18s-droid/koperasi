@@ -41,7 +41,7 @@ function exportPDFGabungan(){
   });
 
   // PREVIEW (AMAN DI GITHUB & APK)
-  const blobUrl = doc.output("bloburl");
+  const pdfData = doc.output("datauristring");
   document.getElementById("pdfFrame").src = blobUrl;
   document.getElementById("pdfPreview").style.display="block";
 }
@@ -49,36 +49,35 @@ function exportPDFGabungan(){
 /* ================= KAS ================= */
 function exportKasPDF(){
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  const doc = new jsPDF("p","mm","a4");
 
   const db = getDB();
   const kas = db.kasDetail || [];
 
-  let masuk=0, keluar=0;
+  doc.setFontSize(14);
+  doc.text("LAPORAN KAS KOPERASI", 14, 15);
+
+  const body = [];
   kas.forEach(k=>{
-    if(k.jenis==="MASUK") masuk+=Number(k.jumlah||0);
-    if(k.jenis==="KELUAR") keluar+=Number(k.jumlah||0);
+    body.push([
+      k.tanggal || "-",
+      k.keterangan || "-",
+      k.jenis==="MASUK" ? "Rp "+Number(k.jumlah).toLocaleString("id-ID") : "-",
+      k.jenis==="KELUAR" ? "Rp "+Number(k.jumlah).toLocaleString("id-ID") : "-"
+    ]);
   });
-
-  doc.setFontSize(16);
-  doc.text("LAPORAN KAS", 14, 15);
-
-  doc.text(`Kas Masuk  : Rp ${masuk.toLocaleString("id-ID")}`,14,25);
-  doc.text(`Kas Keluar : Rp ${keluar.toLocaleString("id-ID")}`,14,32);
-  doc.text(`Saldo Kas  : Rp ${(masuk-keluar).toLocaleString("id-ID")}`,14,39);
 
   doc.autoTable({
-    startY:45,
+    startY:25,
     head:[["Tanggal","Keterangan","Masuk","Keluar"]],
-    body:kas.map(k=>[
-      k.tanggal||"-",
-      k.keterangan||"-",
-      k.jenis==="MASUK" ? rupiah(k.jumlah) : "-",
-      k.jenis==="KELUAR" ? rupiah(k.jumlah) : "-"
-    ])
+    body:body,
+    styles:{fontSize:9}
   });
 
-  previewPDF(doc);
+  // ✅ PREVIEW AMAN APK
+  const pdfData = doc.output("datauristring");
+  document.getElementById("pdfFrame").src = pdfData;
+  document.getElementById("pdfPreview").style.display="block";
 }
 
 function exportPinjamanPDF(){
