@@ -151,10 +151,10 @@ function exportPDF(){
 
   // JUDUL
   doc.setFontSize(14);
-  doc.text("REKAP KAS KOPERASI", 105, 15, { align: "center" });
+  doc.text("Rekap Kas Koperasi", 105, 15, { align: "center" });
 
   doc.setFontSize(10);
-  doc.text("Koperasi Simpan Pinjam", 105, 22, { align: "center" });
+  doc.text("Koperasi ARFA DRIVER'S", 105, 22, { align: "center" });
   doc.text(`Tanggal Cetak : ${today}`, 14, 30);
 
   // RINGKASAN
@@ -186,7 +186,7 @@ function exportPDF(){
   let y = doc.lastAutoTable.finalY + 15;
   doc.text("Mengetahui,", 150, y);
   doc.text("Bendahara", 150, y + 7);
-  doc.text("( .................... )", 135, y + 25);
+  doc.text("( .................... )", 150, y + 25);
 
   doc.save("rekap_kas_koperasi.pdf");
 }
