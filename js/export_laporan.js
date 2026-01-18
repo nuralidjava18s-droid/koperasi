@@ -1,114 +1,115 @@
-
 function exportPDFGabungan(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p","mm","a4");
+
   const db = getDB();
-
   const kas = db.kasDetail || [];
-  const simpanan = db.simpanan || [];
-  const pinjaman = db.pinjaman || [];
-  const angsuran = db.transaksi || [];
 
-  let y = 15;
-
-  /* ================= HEADER ================= */
-  doc.setFontSize(16);
-  doc.text("LAPORAN KOPERASI DRIVER ARFA", 105, y, {align:"center"});
-  y += 7;
-
-  doc.setFontSize(10);
-  doc.text("Tanggal Cetak : " + new Date().toLocaleDateString("id-ID"), 105, y, {align:"center"});
-  y += 10;
-
-  /* ================= RINGKASAN KAS ================= */
   let masuk = 0, keluar = 0;
   kas.forEach(k=>{
-    if(k.jenis==="MASUK") masuk += Number(k.jumlah);
-    if(k.jenis==="KELUAR") keluar += Number(k.jumlah);
+    if(k.jenis==="MASUK") masuk+=Number(k.jumlah||0);
+    if(k.jenis==="KELUAR") keluar+=Number(k.jumlah||0);
   });
-  const saldo = masuk - keluar;
 
-  doc.setFontSize(12);
-  doc.text("RINGKASAN KAS", 14, y); y+=6;
+  doc.setFontSize(14);
+  doc.text("LAPORAN KAS KOPERASI", 14, 15);
 
   doc.setFontSize(10);
-  doc.text(`Kas Masuk  : Rp ${masuk.toLocaleString("id-ID")}`, 14, y); y+=5;
-  doc.text(`Kas Keluar : Rp ${keluar.toLocaleString("id-ID")}`, 14, y); y+=5;
-  doc.text(`Saldo Kas  : Rp ${saldo.toLocaleString("id-ID")}`, 14, y);
+  doc.text(`Kas Masuk  : Rp ${masuk.toLocaleString("id-ID")}`, 14, 25);
+  doc.text(`Kas Keluar : Rp ${keluar.toLocaleString("id-ID")}`, 14, 31);
+  doc.text(`Saldo Kas  : Rp ${(masuk-keluar).toLocaleString("id-ID")}`, 14, 37);
 
-  /* ================= HALAMAN BARU ================= */
-  doc.addPage();
-  y = 15;
-
-  /* ================= A. KAS ================= */
-  doc.setFontSize(13);
-  doc.text("A. LAPORAN KAS",14,y); y+=5;
+  const body=[];
+  kas.forEach(k=>{
+    body.push([
+      k.tanggal || "-",
+      k.keterangan || "-",
+      k.jenis==="MASUK"
+        ? "Rp "+Number(k.jumlah).toLocaleString("id-ID")
+        : "-",
+      k.jenis==="KELUAR"
+        ? "Rp "+Number(k.jumlah).toLocaleString("id-ID")
+        : "-"
+    ]);
+  });
 
   doc.autoTable({
-    startY:y,
+    startY:45,
+    head:[["Tanggal","Keterangan","Masuk","Keluar"]],
+    body:body,
+    styles:{fontSize:9}
+  });
+
+  // PREVIEW (AMAN DI GITHUB & APK)
+  const blobUrl = doc.output("bloburl");
+  document.getElementById("pdfFrame").src = blobUrl;
+  document.getElementById("pdfPreview").style.display="block";
+}
+
+/* ================= KAS ================= */
+function exportKasPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const db = getDB();
+  const kas = db.kasDetail || [];
+
+  let masuk=0, keluar=0;
+  kas.forEach(k=>{
+    if(k.jenis==="MASUK") masuk+=Number(k.jumlah||0);
+    if(k.jenis==="KELUAR") keluar+=Number(k.jumlah||0);
+  });
+
+  doc.setFontSize(16);
+  doc.text("LAPORAN KAS", 14, 15);
+
+  doc.text(`Kas Masuk  : Rp ${masuk.toLocaleString("id-ID")}`,14,25);
+  doc.text(`Kas Keluar : Rp ${keluar.toLocaleString("id-ID")}`,14,32);
+  doc.text(`Saldo Kas  : Rp ${(masuk-keluar).toLocaleString("id-ID")}`,14,39);
+
+  doc.autoTable({
+    startY:45,
     head:[["Tanggal","Keterangan","Masuk","Keluar"]],
     body:kas.map(k=>[
-      k.tanggal,
-      k.keterangan,
-      k.jenis==="MASUK" ? "Rp "+Number(k.jumlah).toLocaleString("id-ID") : "-",
-      k.jenis==="KELUAR" ? "Rp "+Number(k.jumlah).toLocaleString("id-ID") : "-"
-    ]),
-    styles:{fontSize:9}
+      k.tanggal||"-",
+      k.keterangan||"-",
+      k.jenis==="MASUK" ? rupiah(k.jumlah) : "-",
+      k.jenis==="KELUAR" ? rupiah(k.jumlah) : "-"
+    ])
   });
 
-  /* ================= B. SIMPANAN ================= */
-  doc.addPage();
-  y = 15;
-  doc.setFontSize(13);
-  doc.text("B. SIMPANAN ANGGOTA",14,y); y+=5;
+  previewPDF(doc);
+}
+
+function exportPinjamanPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const db = getDB();
+
+  doc.setFontSize(16);
+  doc.text("LAPORAN PINJAMAN",14,15);
 
   doc.autoTable({
-    startY:y,
-    head:[["Tanggal","Anggota","Jenis","Jumlah"]],
-    body:simpanan.map(s=>[
-      s.tanggal,
-      s.nama || s.anggota,
-      s.jenis,
-      "Rp "+Number(s.jumlah).toLocaleString("id-ID")
-    ]),
-    styles:{fontSize:9}
+    startY:25,
+    head:[["Anggota","Pinjaman","Bunga","Tenor","Sisa"]],
+    body:db.pinjaman.map(p=>[
+      p.nama,
+      rupiah(p.jumlah),
+      p.bunga+"%",
+      p.tenor+" bln",
+      rupiah(p.sisa)
+    ])
   });
 
-  /* ================= C. PINJAMAN ================= */
-  doc.addPage();
-  y = 15;
-  doc.setFontSize(13);
-  doc.text("C. DATA PINJAMAN",14,y); y+=5;
+  previewPDF(doc);
+}
 
-  doc.autoTable({
-    startY:y,
-    head:[["Tanggal","Anggota","Jumlah","Tenor"]],
-    body:pinjaman.map(p=>[
-      p.tanggal,
-      p.nama || p.anggota,
-      "Rp "+Number(p.jumlah).toLocaleString("id-ID"),
-      p.tenor + " x"
-    ]),
-    styles:{fontSize:9}
-  });
+function previewPDF(doc){
+  const blobUrl = doc.output("bloburl");
+  document.getElementById("pdfFrame").src = blobUrl;
+  document.getElementById("pdfPreview").style.display="block";
+}
 
-  /* ================= D. ANGSURAN ================= */
-  doc.addPage();
-  y = 15;
-  doc.setFontSize(13);
-  doc.text("D. ANGSURAN PINJAMAN",14,y); y+=5;
-
-  doc.autoTable({
-    startY:y,
-    head:[["Tanggal","Anggota","Jumlah"]],
-    body:angsuran.map(a=>[
-      a.tanggal,
-      a.nama || a.anggota,
-      "Rp "+Number(a.jumlah).toLocaleString("id-ID")
-    ]),
-    styles:{fontSize:9}
-  });
-
-  /* ================= PREVIEW (AMAN APK) ================= */
-  window.open(doc.output("bloburl"));
+function rupiah(n){
+  return "Rp " + Number(n||0).toLocaleString("id-ID");
 }
