@@ -30,9 +30,10 @@ button{
   padding:10px 15px;
   border:none;
   border-radius:6px;
-  margin:5px 0;
+  margin:6px 0;
   cursor:pointer;
   width:100%;
+  font-weight:bold;
 }
 .btn-kas{ background:#2ecc71; color:white }
 .btn-pinjaman{ background:#e67e22; color:white }
@@ -47,7 +48,7 @@ iframe{
   height:500px;
   border:1px solid #ccc;
 }
-  select{
+select{
   width:100%;
   padding:8px;
   margin-bottom:10px;
@@ -68,65 +69,61 @@ label{
 </header>
 
 <div class="container">
-<label>Anggota</label>
-<select id="filterAnggota">
-  <option value="">Semua Anggota</option>
-</select>
 
-<label>Status Pinjaman</label>
-<select id="filterStatus">
-  <option value="">Semua</option>
-  <option value="AKTIF">Belum Lunas</option>
-  <option value="LUNAS">Lunas</option>
-</select>
+  <label>Anggota</label>
+  <select id="filterAnggota">
+    <option value="">Semua Anggota</option>
+  </select>
 
-<button onclick="exportPinjamanFilterPDF()">
-  📄 Export Pinjaman (Filter)
-</button>
-  <button class="btn-kas" onclick="exportKasPDF()">📄 Laporan Kas</button>
-  <button class="btn-pinjaman" onclick="exportPinjamanPDF()">📄 Laporan Pinjaman</button>
-  <button class="btn-full" onclick="exportPDFGabungan()">📄 Laporan Lengkap</button>
+  <label>Status Pinjaman</label>
+  <select id="filterStatus">
+    <option value="">Semua</option>
+    <option value="AKTIF">Belum Lunas</option>
+    <option value="LUNAS">Lunas</option>
+  </select>
+
+  <!-- FILTER -->
   <button class="btn-pinjaman" onclick="exportPinjamanFilterPDF()">
-  📄 Export Pinjaman (Filter)</button>
-  <div id="pdfPreview">
-  <h4>Preview PDF</h4>
-  <iframe id="pdfFrame"></iframe>
-
-  <button onclick="downloadPDF()" style="
-    margin-top:10px;
-    background:#1e90ff;
-    color:white;
-    padding:10px;
-    border:none;
-    border-radius:6px;
-    width:100%;
-    font-weight:bold;
-  ">
-    ⬇ Download PDF
+    📄 Export Pinjaman (Filter)
   </button>
-  <button onclick="shareWA()" style="
-  margin-top:10px;
-  background:#25d366;
-  color:white;
-  padding:10px;
-  border:none;
-  border-radius:6px;
-  width:100%;
-  font-weight:bold;
-">
-  📲 Share WhatsApp
-</button>
-</div>
-  
+
+  <!-- LAPORAN -->
+  <button class="btn-kas" onclick="exportKasPDF()">
+    📄 Laporan Kas
+  </button>
+
+  <button class="btn-pinjaman" onclick="exportPinjamanPDF()">
+    📄 Laporan Pinjaman
+  </button>
+
+  <button class="btn-full" onclick="exportPinjamanPerAnggotaPDF()">
+    📄 Pinjaman per Anggota
+  </button>
+
+  <!-- PREVIEW -->
+  <div id="pdfPreview">
+    <h4>Preview PDF</h4>
+    <iframe id="pdfFrame"></iframe>
+
+    <button onclick="downloadPDF()" style="background:#1e90ff;color:white">
+      ⬇ Download PDF
+    </button>
+
+    <button onclick="shareWA()" style="background:#25d366;color:white">
+      📲 Share WhatsApp
+    </button>
+  </div>
+
 </div>
 
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/export_laporan.js"></script>
 
-  <script>
+<script>
   cekLogin();
   loadFilterAnggota();
-  </script>
+</script>
+
 </body>
 </html>
