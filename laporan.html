@@ -1,81 +1,99 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laporan Koperasi</title>
-
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#f4f6f9;
+/* ================= PREVIEW PDF ================= */
+function previewPDF(doc){
+  const pdfData = doc.output("datauristring"); // AMAN APK
+  document.getElementById("pdfFrame").src = pdfData;
+  document.getElementById("pdfPreview").style.display = "block";
 }
-header{
-  background:#1e90ff;
-  color:white;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+
+function rupiah(n){
+  return "Rp " + Number(n || 0).toLocaleString("id-ID");
 }
-.container{
-  padding:20px;
+
+/* ================= LAPORAN KAS ================= */
+function exportKasPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("p","mm","a4");
+  const db = getDB();
+  const kas = db.kas || [];
+
+  doc.setFontSize(14);
+  doc.text("LAPORAN KAS KOPERASI", 14, 15);
+
+  const body = kas.map(k=>[
+    k.tanggal || "-",
+    k.keterangan || "-",
+    k.jenis==="MASUK" ? rupiah(k.jumlah) : "-",
+    k.jenis==="KELUAR" ? rupiah(k.jumlah) : "-"
+  ]);
+
+  doc.autoTable({
+    startY:25,
+    head:[["Tanggal","Keterangan","Masuk","Keluar"]],
+    body:body,
+    styles:{fontSize:9}
+  });
+
+  previewPDF(doc);
 }
-button{
-  padding:10px 15px;
-  border:none;
-  border-radius:6px;
-  margin:5px 0;
-  cursor:pointer;
-  width:100%;
+
+/* ================= LAPORAN PINJAMAN ================= */
+function exportPinjamanPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("p","mm","a4");
+  const db = getDB();
+
+  doc.setFontSize(14);
+  doc.text("LAPORAN PINJAMAN",14,15);
+
+  doc.autoTable({
+    startY:25,
+    head:[["Anggota","Jumlah","Bunga","Tenor"]],
+    body:(db.pinjaman || []).map(p=>[
+      p.nama || "-",
+      rupiah(p.jumlah),
+      (p.bunga || 0) + "%",
+      (p.tenor || 0) + " bln"
+    ])
+  });
+
+  previewPDF(doc);
 }
-.btn-kas{ background:#2ecc71; color:white }
-.btn-pinjaman{ background:#e67e22; color:white }
-.btn-full{ background:#34495e; color:white }
 
-#pdfPreview{
-  display:none;
-  margin-top:20px;
+/* ================= LAPORAN GABUNGAN ================= */
+function exportGabunganPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("p","mm","a4");
+  const db = getDB();
+
+  /* === HALAMAN 1 : KAS === */
+  doc.setFontSize(14);
+  doc.text("LAPORAN KAS",14,15);
+
+  doc.autoTable({
+    startY:25,
+    head:[["Tanggal","Keterangan","Masuk","Keluar"]],
+    body:(db.kas || []).map(k=>[
+      k.tanggal || "-",
+      k.keterangan || "-",
+      k.jenis==="MASUK" ? rupiah(k.jumlah) : "-",
+      k.jenis==="KELUAR" ? rupiah(k.jumlah) : "-"
+    ])
+  });
+
+  /* === HALAMAN 2 : PINJAMAN === */
+  doc.addPage();
+  doc.text("LAPORAN PINJAMAN",14,15);
+
+  doc.autoTable({
+    startY:25,
+    head:[["Anggota","Jumlah","Bunga","Tenor"]],
+    body:(db.pinjaman || []).map(p=>[
+      p.nama || "-",
+      rupiah(p.jumlah),
+      (p.bunga || 0) + "%",
+      (p.tenor || 0) + " bln"
+    ])
+  });
+
+  previewPDF(doc);
 }
-iframe{
-  width:100%;
-  height:500px;
-  border:1px solid #ccc;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <h3>Laporan Koperasi</h3>
-  <button onclick="location.href='dashboard.html'">⬅ Dashboard</button>
-</header>
-
-<div class="container">
-
-  <button class="btn-kas" onclick="exportKasPDF()">📄 Laporan Kas</button>
-  <button class="btn-pinjaman" onclick="exportPinjamanPDF()">📄 Laporan Pinjaman</button>
-  <button class="btn-full" onclick="exportGabunganPDF()">📄 Laporan Lengkap</button>
-
-  <div id="pdfPreview">
-    <h4>Preview PDF</h4>
-    <iframe id="pdfFrame"></iframe>
-  </div>
-
-</div>
-
-<script src="js/storage.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/export_laporan.js"></script>
-<script>
-cekLogin();
-</script>
-
-</body>
-</html>
