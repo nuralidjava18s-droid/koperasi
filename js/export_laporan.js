@@ -1,9 +1,19 @@
+function previewPDF(doc){
+  const pdfData = doc.output("datauristring");
+  document.getElementById("pdfFrame").src = pdfData;
+  document.getElementById("pdfPreview").style.display = "block";
+}
+
+function rupiah(n){
+  return "Rp " + Number(n||0).toLocaleString("id-ID");
+}
+
 function exportPDFGabungan(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p","mm","a4");
 
   const db = getDB();
-  const kas = db.kasDetail || [];
+  const kas = db.kas || []; || [];
 
   let masuk = 0, keluar = 0;
   kas.forEach(k=>{
@@ -40,19 +50,17 @@ function exportPDFGabungan(){
     styles:{fontSize:9}
   });
 
-  // PREVIEW (AMAN DI GITHUB & APK)
-  const pdfData = doc.output("datauristring");
-  document.getElementById("pdfFrame").src = blobUrl;
-  document.getElementById("pdfPreview").style.display="block";
+  previewPDF(doc); // ✅
 }
 
 /* ================= KAS ================= */
+
 function exportKasPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p","mm","a4");
 
   const db = getDB();
-  const kas = db.kasDetail || [];
+  const kas = db.kas || []; || [];
 
   doc.setFontSize(14);
   doc.text("LAPORAN KAS KOPERASI", 14, 15);
@@ -74,24 +82,22 @@ function exportKasPDF(){
     styles:{fontSize:9}
   });
 
-  // ✅ PREVIEW AMAN APK
-  const pdfData = doc.output("datauristring");
-  document.getElementById("pdfFrame").src = pdfData;
-  document.getElementById("pdfPreview").style.display="block";
+  previewPDF(doc); // ✅
 }
 
 function exportPinjamanPDF(){
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  const doc = new jsPDF("p","mm","a4");
   const db = getDB();
+  const pinjaman = db.pinjaman || [];
 
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.text("LAPORAN PINJAMAN",14,15);
 
   doc.autoTable({
     startY:25,
     head:[["Anggota","Pinjaman","Bunga","Tenor","Sisa"]],
-    body:db.pinjaman.map(p=>[
+    body:(db.pinjaman||[]).map(p=>[
       p.nama,
       rupiah(p.jumlah),
       p.bunga+"%",
@@ -100,15 +106,8 @@ function exportPinjamanPDF(){
     ])
   });
 
-  previewPDF(doc);
+  previewPDF(doc); // ✅ AMAN APK
 }
 
-function previewPDF(doc){
-  const blobUrl = doc.output("bloburl");
-  document.getElementById("pdfFrame").src = blobUrl;
-  document.getElementById("pdfPreview").style.display="block";
-}
 
-function rupiah(n){
-  return "Rp " + Number(n||0).toLocaleString("id-ID");
-}
+
