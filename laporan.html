@@ -63,11 +63,37 @@ iframe{
   <button class="btn-pinjaman" onclick="exportPinjamanPDF()">📄 Laporan Pinjaman</button>
   <button class="btn-full" onclick="exportGabunganPDF()">📄 Laporan Lengkap</button>
 
-  <div id="pdfPreview">
-    <h4>Preview PDF</h4>
-    <iframe id="pdfFrame"></iframe>
-  </div>
+  
+<div id="pdfPreview">
+  <h4>Preview PDF</h4>
+  <iframe id="pdfFrame"></iframe>
 
+  <button onclick="downloadPDF()" style="
+    margin-top:10px;
+    background:#1e90ff;
+    color:white;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    width:100%;
+    font-weight:bold;
+  ">
+    ⬇ Download PDF
+  </button>
+  <button onclick="shareWA()" style="
+  margin-top:10px;
+  background:#25d366;
+  color:white;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  width:100%;
+  font-weight:bold;
+">
+  📲 Share WhatsApp
+</button>
+</div>
+  
 </div>
 
 <script src="js/storage.js"></script>
