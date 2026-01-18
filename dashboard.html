@@ -155,9 +155,29 @@ header h3 {
   font-size:13px;
   cursor:pointer;
 }
+  .tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+.tabs button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#e0e0e0;
+  font-weight:bold;
+}
+.tabs button.active{
+  background:#1e90ff;
+  color:white;
+}
   </style>
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
-
+  
 <body>
 <header class="navbar">
   <div class="nav-left">
@@ -224,21 +244,23 @@ header h3 {
     </div>
     
      
-    <button onclick="exportPDFGabungan()">📄 Export Laporan Lengkap</button>
+    
 
     <div class="card" onclick="location.href='lap_anggota.html'">
       <h3>📊 Laporan</h3>
       <p>Rekap & export</p>
     </div>
+    
+    
 
+    <button onclick="exportPDFGabungan()">📄 Export Laporan Lengkap</button>
   </div>
+  <div id="pdfPreview" style="display:none;margin-top:20px">
+  <iframe id="pdfFrame" style="width:100%;height:500px;border:1px solid #ccc"></iframe>
+</div>
 </div>
 
-<!-- SCRIPT -->
-<script src="js/storage.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/dashboard.js"></script>
-<script src="js/export_laporan.js"></script>
+
 <script>
   cekLogin();
 
@@ -280,6 +302,13 @@ header h3 {
 
   loadDashboard();
 </script>
+<!-- SCRIPT -->
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/export_laporan.js"></script>
 
+</body>
+</html>
 </body>
 </html>
