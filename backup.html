@@ -3,26 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <title>Backup & Restore</title>
+  
 <style>
-body{
-  font-family:Arial;
-  padding:20px;
+ 
+  body{ margin:0; font-family:Arial, sans-serif; 
+    background:#f4f6f9; }
+  
+  header{ background:#1e90ff; color:white; 
+    padding:10px; display:flex;
+    justify-content:space-between; 
+    align-items:center; }
+  
+  header h2{ font-size:18px; 
+    margin:0; }
+  header button{ background:#ff5252; 
+    border:none; color:white; padding:5px 10px;
+    border-radius:5px; font-size:14px; }
+  
+  button{ padding:10px 15px;
+    margin:5px; cursor:pointer; }
+
+  body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
 }
-button{
-  padding:10px 15px;
-  margin:5px;
-  cursor:pointer;
+  header{
+  background:#1e90ff;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
+
 </style>
 </head>
 <body>
-
-<h2>Backup & Restore Data</h2>
-
+<header>
+  <h2>Backup & Restore Data</h2>
+  <div>
+    <button onclick="location.href='dashboard.html'">Dashboard</button>
+   </div>
+</header>
+  
 <button onclick="backup()">⬇️ Backup Data</button>
-
 <hr>
-
 <input type="file" id="fileRestore">
 <br><br>
 <button onclick="restore()">⬆️ Restore Data</button>

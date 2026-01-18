@@ -1,4 +1,4 @@
-ko<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -6,6 +6,30 @@ ko<!DOCTYPE html>
   <title>Dashboard Koperasi</title>
 
   <style>
+  body {
+  font-size: 14px;
+}
+
+header h3 {
+  font-size: 16px;
+}
+
+.card h3 {
+  font-size: 16px;
+}
+
+.card p {
+  font-size: 12px;
+}
+
+.summary .box {
+  font-size: 14px;
+}
+
+#kasMasukDashboard, #kasKeluarDashboard, #saldoKasDashboard {
+  font-size: 16px;
+}
+
     body{
       margin:0;
       font-family:Arial, sans-serif;
@@ -70,26 +94,92 @@ ko<!DOCTYPE html>
       font-size:20px;
       font-weight:bold;
     }
+.summary{
+  display:flex;
+  gap:10px;
+  margin:15px 0;
+}
+.summary .box{
+  flex:1;
+  background:white;
+  padding:15px;
+  border-radius:8px;
+  text-align:center;
+  font-weight:bold;
+}
+  .navbar{
+  background:#1e90ff;
+  color:white;
+  padding:12px 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.nav-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo{
+  width:60px;
+  height:60px;
+  border-radius:80%;
+  background:white;
+  padding:3px;
+}
+
+.nav-right button{
+  background:#ff5252;
+  border:none;
+  color:white;
+  padding:6px 10px;
+  border-radius:5px;
+  cursor:pointer;
+}
   </style>
 </head>
 
 <body>
 
-<header>
-  <h2>Koperasi Simpan Pinjam </h2>
-  <h2>ARFA schoolbus</h2>
-  <button onclick="logout()">Logout</button>
+<header class="navbar">
+  <div class="nav-left">
+    <img src="img/logo.png" class="logo">
+    <h3>Koperasi driver</h3>
+    <h2> ARFA  </h2>
+  </div>
+
+  <div class="nav-right">
+    
+    <button onclick="logout()">Logout</button>
+  </div>
 </header>
 
 <div class="container">
   <div class="grid">
 
     <!-- TOTAL SALDO -->
-    <div class="box">
-  <h3>💰 Saldo Kas</h3>
-  <h2 id="saldoKasDashboard">Rp 0</h2>
-</div>
     
+    
+    <div class="summary" style="display:flex; gap:12px;">
+  
+  <div class="box" style="background:#e8f5e9; flex:1;">
+    ⬇️ Kas Masuk<br>
+    <b id="kasMasukDashboard" style="font-size:20px;color:green">Rp 0</b>
+  </div>
+
+  <div class="box" style="background:#ffebee; flex:1;">
+    ⬆️ Kas Keluar<br>
+    <b id="kasKeluarDashboard" style="font-size:20px;color:red">Rp 0</b>
+  </div>
+
+  <div class="box" style="background:#e3f2fd; flex:1;">
+    💰 Saldo Akhir<br>
+    <b id="saldoKasDashboard" style="font-size:22px">Rp 0</b>
+  </div>
+
+</div>
 <div class="card" onclick="location.href='input_kas.html'">
       <h3>💰 Input Kas</h3>
       <p>Input kas masuk & keluar</p>
@@ -99,7 +189,10 @@ ko<!DOCTYPE html>
       <p>Data anggota koperasi</p>
     </div>
 
-    
+     <div class="card" onclick="location.href='backup.html'">
+      <h3>💾 Backup & Restore</h3>
+      <p>backup & restore</p>
+    </div>
 
     <div class="card" onclick="location.href='simpanan.html'">
       <h3>💾 Simpanan</h3>
