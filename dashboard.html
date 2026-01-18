@@ -107,7 +107,7 @@ header h3 {
   text-align:center;
   font-weight:bold;
 }
-  .navbar{
+.navbar{
   background:#1e90ff;
   color:white;
   padding:12px 15px;
@@ -119,43 +119,73 @@ header h3 {
 .nav-left{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
 }
-
+.navbar{
+  box-shadow:0 3px 8px rgba(0,0,0,.15);
+}
 .logo{
-  width:60px;
-  height:60px;
-  border-radius:80%;
-  background:white;
-  padding:3px;
+  height:42px;
+  width:auto;
+  display:block;
 }
 
+.brand-text{
+  display:flex;
+  flex-direction:column;
+  line-height:1.1;
+}
+
+.brand-text .subtitle{
+  font-size:12px;
+  opacity:0.9;
+}
+
+.brand-text .title{
+  font-size:18px;
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+/* Tombol logout */
 .nav-right button{
   background:#ff5252;
   border:none;
   color:white;
-  padding:6px 10px;
-  border-radius:5px;
+  padding:7px 12px;
+  border-radius:6px;
+  font-size:13px;
   cursor:pointer;
 }
+    @media (max-width:480px){
+  .logo{
+    height:36px;
+  }
+  .brand-text .title{
+    font-size:16px;
+  }
+    }
   </style>
 </head>
 
 <body>
 
+
 <header class="navbar">
   <div class="nav-left">
-    <img src="img/logo.png" class="logo">
-    <h3>Koperasi driver</h3>
-    <h2> ARFA  </h2>
+    <img src="img/logo.png" alt="Logo Koperasi" class="logo">
+
+    <div class="brand-text">
+      <span class="subtitle">Koperasi Driver</span>
+      <span class="title">ARFA</span>
+    </div>
   </div>
 
   <div class="nav-right">
-    
     <button onclick="logout()">Logout</button>
   </div>
 </header>
-
+  
 <div class="container">
   <div class="grid">
 
