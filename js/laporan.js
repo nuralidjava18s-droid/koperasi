@@ -1,4 +1,10 @@
 /* =====================
+   GLOBAL PDF PREVIEW
+===================== */
+let lastPDFBlob = null;
+let lastPDFUrl  = null;
+
+/* =====================
    FILTER ANGGOTA
 ===================== */
 function loadFilter(){
@@ -26,7 +32,7 @@ function loadLaporan(){
   db.simpanan
     .filter(s => !filter || s.anggota_id === filter)
     .forEach(s=>{
-      const a = db.anggota.find(x=>x.id===s.anggota_id);
+      const a = db.anggota.find(x=>x.id === s.anggota_id);
       totalS += Number(s.jumlah);
 
       listS.innerHTML += `
@@ -49,7 +55,7 @@ function loadLaporan(){
   db.pinjaman
     .filter(p => !filter || p.anggota_id === filter)
     .forEach(p=>{
-      const a = db.anggota.find(x=>x.id===p.anggota_id);
+      const a = db.anggota.find(x=>x.id === p.anggota_id);
       totalP += Number(p.sisa);
 
       listP.innerHTML += `
@@ -67,60 +73,9 @@ function loadLaporan(){
 }
 
 /* =====================
-   SIMPANAN → EXCEL
+   PREVIEW SIMPANAN PDF
 ===================== */
-function exportSimpananExcel(){
-  const db = getDB();
-  const filter = document.getElementById("filterAnggota").value;
-
-  const data = db.simpanan
-    .filter(s => !filter || s.anggota_id === filter)
-    .map(s=>{
-      const a = db.anggota.find(x=>x.id===s.anggota_id);
-      return {
-        Tanggal: s.tanggal,
-        Anggota: a ? a.nama : "-",
-        Jenis: s.jenis,
-        Jumlah: s.jumlah
-      };
-    });
-
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Simpanan");
-  XLSX.writeFile(wb, "laporan_simpanan.xlsx");
-}
-
-/* =====================
-   PINJAMAN → EXCEL
-===================== */
-function exportPinjamanExcel(){
-  const db = getDB();
-  const filter = document.getElementById("filterAnggota").value;
-
-  const data = db.pinjaman
-    .filter(p => !filter || p.anggota_id === filter)
-    .map(p=>{
-      const a = db.anggota.find(x=>x.id===p.anggota_id);
-      return {
-        Anggota: a ? a.nama : "-",
-        Tanggal: p.tanggal,
-        Jumlah: p.jumlah,
-        Sisa: p.sisa,
-        Status: p.status
-      };
-    });
-
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Pinjaman");
-  XLSX.writeFile(wb, "laporan_pinjaman.xlsx");
-}
-
-/* =====================
-   SIMPANAN → PDF
-===================== */
-function exportSimpananPDF(){
+function previewSimpananPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const db = getDB();
@@ -128,13 +83,13 @@ function exportSimpananPDF(){
 
   let y = 10;
   doc.setFontSize(12);
-  doc.text("Laporan Simpanan", 10, y);
+  doc.text("LAPORAN SIMPANAN", 10, y);
   y += 10;
 
   db.simpanan
     .filter(s => !filter || s.anggota_id === filter)
     .forEach((s,i)=>{
-      const a = db.anggota.find(x=>x.id===s.anggota_id);
+      const a = db.anggota.find(x=>x.id === s.anggota_id);
       doc.setFontSize(10);
       doc.text(
         `${i+1}. ${s.tanggal} | ${a ? a.nama : "-"} | ${s.jenis} | Rp ${Number(s.jumlah).toLocaleString("id-ID")}`,
@@ -147,38 +102,58 @@ function exportSimpananPDF(){
       }
     });
 
-  doc.save("laporan_simpanan.pdf");
+  lastPDFBlob = doc.output("blob");
+  if(lastPDFUrl) URL.revokeObjectURL(lastPDFUrl);
+  lastPDFUrl = URL.createObjectURL(lastPDFBlob);
+
+  document.getElementById("pdfPreview").src = lastPDFUrl;
 }
 
 /* =====================
-   PINJAMAN → PDF
+   DOWNLOAD PDF
 ===================== */
-function exportPinjamanPDF(){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+function downloadPDF(){
+  if(!lastPDFBlob){
+    alert("Preview PDF dulu sebelum download!");
+    return;
+  }
+
+  const a = document.createElement("a");
+  a.href = lastPDFUrl;
+  a.download = "laporan_simpanan.pdf";
+  a.click();
+}
+
+/* =====================
+   SIMPANAN → EXCEL
+===================== */
+function exportSimpananExcel(){
   const db = getDB();
   const filter = document.getElementById("filterAnggota").value;
 
-  let y = 10;
-  doc.setFontSize(12);
-  doc.text("Laporan Pinjaman", 10, y);
-  y += 10;
-
-  db.pinjaman
-    .filter(p => !filter || p.anggota_id === filter)
-    .forEach((p,i)=>{
-      const a = db.anggota.find(x=>x.id===p.anggota_id);
-      doc.setFontSize(10);
-      doc.text(
-        `${i+1}. ${a ? a.nama : "-"} | ${p.tanggal} | Rp ${Number(p.jumlah).toLocaleString("id-ID")} | Sisa Rp ${Number(p.sisa).toLocaleString("id-ID")} | ${p.status}`,
-        10, y
-      );
-      y += 7;
-      if(y > 280){
-        doc.addPage();
-        y = 10;
-      }
+  const data = db.simpanan
+    .filter(s => !filter || s.anggota_id === filter)
+    .map(s=>{
+      const a = db.anggota.find(x=>x.id === s.anggota_id);
+      return {
+        Tanggal: s.tanggal,
+        Anggota: a ? a.nama : "-",
+        Jenis: s.jenis,
+        Jumlah: s.jumlah
+      };
     });
 
-  doc.save("laporan_pinjaman.pdf");
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Simpanan");
+
+  const out = XLSX.write(wb, { bookType:"xlsx", type:"array" });
+  const blob = new Blob([out], { type:"application/octet-stream" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan_simpanan.xlsx";
+  a.click();
+  URL.revokeObjectURL(url);
 }
