@@ -36,8 +36,8 @@ header{
 header h3{margin:0}
 
 header button{
-  background:white;
-  color:#1e90ff;
+  background:#ff5252;
+  color:white;
   border:none;
   padding:6px 12px;
   border-radius:6px;
@@ -63,7 +63,6 @@ header button{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:12px;
-  margin-bottom:20px;
 }
 
 .summary div{
@@ -71,7 +70,6 @@ header button{
   border-radius:14px;
   text-align:center;
   font-weight:bold;
-  box-shadow:0 4px 10px rgba(0,0,0,.08);
 }
 
 .summary span{
@@ -87,7 +85,6 @@ header button{
   color:#1e90ff;
 }
 
-/* FORM */
 input,select{
   width:100%;
   padding:10px;
@@ -95,13 +92,7 @@ input,select{
   border-radius:8px;
   border:1px solid #ccc;
 }
-header button{
-  background:#ff5252;
-  border:none;
-  color:white;
-  padding:6px 10px;
-  border-radius:5px;
-}
+
 button{
   padding:8px 14px;
   border-radius:8px;
@@ -112,12 +103,6 @@ button{
 
 button:hover{opacity:.9}
 
-button[onclick*="simpan"]{
-  background:var(--primary);
-  color:white;
-}
-
-/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
@@ -134,25 +119,6 @@ td{
   border-bottom:1px solid #eee;
 }
 
-tr:hover{background:#f9fbfd}
-
-/* AKSI */
-td button{
-  margin:2px;
-  font-size:12px;
-}
-
-td button:first-child{
-  background:#f1c40f;
-  color:#000;
-}
-
-td button:last-child{
-  background:#e74c3c;
-  color:white;
-}
-
-/* EXPORT BUTTON */
 .export{
   display:flex;
   gap:10px;
@@ -164,9 +130,11 @@ td button:last-child{
   color:white;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-  header h3{font-size:16px}
+iframe{
+  width:100%;
+  height:450px;
+  border:1px solid #ddd;
+  border-radius:10px;
 }
 </style>
 </head>
@@ -180,63 +148,161 @@ td button:last-child{
 
 <div class="container">
 
-  <!-- SUMMARY -->
-  <div class="summary">
-    <div class="in">Kas Masuk<br><span id="kasMasuk">Rp 0</span></div>
-    <div class="out">Kas Keluar<br><span id="kasKeluar">Rp 0</span></div>
-    <div>Saldo Kas<br><span id="saldoKas">Rp 0</span></div>
-  </div>
-
-  <!-- INPUT KAS -->
-  <div class="box">
-    <h4>➕ Input Kas Manual</h4>
-
-    <input type="date" id="tglKas"><br>
-    <input type="text" id="ketKas" placeholder="Keterangan"><br>
-
-    <select id="jenisKas">
-      <option value="MASUK">Kas Masuk</option>
-      <option value="KELUAR">Kas Keluar</option>
-    </select><br>
-
-    <input type="number" id="jumlahKas" placeholder="Jumlah"><br>
-
-    <button onclick="simpanKas()">💾 Simpan</button>
-  </div>
-
-  <!-- TABEL -->
-  <div class="box">
-    <h4>📋 Detail Kas</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>Tanggal</th>
-          <th>Keterangan</th>
-          <th>Masuk</th>
-          <th>Keluar</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="listKas"></tbody>
-    </table>
-  </div>
-
-  <!-- EXPORT -->
-  <div class="export">
-  <button onclick="exportPDF()">📄 Export PDF</button>
-  <button onclick="exportWA()">📲 Export WhatsApp</button>
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="in">Kas Masuk<br><span id="kasMasuk">Rp 0</span></div>
+  <div class="out">Kas Keluar<br><span id="kasKeluar">Rp 0</span></div>
+  <div>Saldo Kas<br><span id="saldoKas">Rp 0</span></div>
 </div>
+
+<!-- INPUT -->
+<div class="box">
+  <h4>➕ Input Kas Manual</h4>
+  <input type="date" id="tglKas">
+  <input type="text" id="ketKas" placeholder="Keterangan">
+  <select id="jenisKas">
+    <option value="MASUK">Kas Masuk</option>
+    <option value="KELUAR">Kas Keluar</option>
+  </select>
+  <input type="number" id="jumlahKas" placeholder="Jumlah">
+  <button onclick="simpanKas()">💾 Simpan</button>
+</div>
+
+<!-- TABLE -->
+<div class="box">
+  <h4>📋 Detail Kas</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Keterangan</th>
+        <th>Masuk</th>
+        <th>Keluar</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="listKas"></tbody>
+  </table>
+</div>
+
+<!-- EXPORT -->
+<div class="box">
+  <h4>📄 Preview PDF</h4>
+  <iframe id="pdfPreview"></iframe>
+  <br><br>
+  <div class="export">
+    <button onclick="previewPDF()">👁 Preview PDF</button>
+    <button onclick="downloadPDF()">⬇️ Download PDF</button>
+    <button onclick="exportWA()">📲 WhatsApp</button>
+  </div>
+</div>
+
 </div>
 
 <!-- LIBRARY -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
 <script src="js/storage.js"></script>
-<script src="js/input_kas.js"></script>
 
 <script>
+let editIndex=null, pdfBlob=null, pdfURL=null;
+const kasMasukEl=kasMasuk, kasKeluarEl=kasKeluar, saldoKasEl=saldoKas;
+
+function rupiah(n){return "Rp "+Number(n||0).toLocaleString("id-ID");}
+
+function loadKas(){
+  const db=getDB();
+  let masuk=0, keluar=0;
+  listKas.innerHTML="";
+
+  db.kas?.forEach((k,i)=>{
+    if(k.jenis==="MASUK"){masuk+=k.jumlah;}
+    else{keluar+=k.jumlah;}
+
+    listKas.innerHTML+=`
+    <tr>
+      <td>${k.tanggal}</td>
+      <td>${k.keterangan}</td>
+      <td>${k.jenis==="MASUK"?rupiah(k.jumlah):"-"}</td>
+      <td>${k.jenis==="KELUAR"?rupiah(k.jumlah):"-"}</td>
+      <td>
+        <button onclick="editKas(${i})">✏️</button>
+        <button onclick="hapusKas(${i})">🗑️</button>
+      </td>
+    </tr>`;
+  });
+
+  kasMasukEl.innerText=rupiah(masuk);
+  kasKeluarEl.innerText=rupiah(keluar);
+  saldoKasEl.innerText=rupiah(masuk-keluar);
+}
+
+function simpanKas(){
+  const db=getDB();
+  const data={
+    tanggal:tglKas.value,
+    keterangan:ketKas.value,
+    jenis:jenisKas.value,
+    jumlah:Number(jumlahKas.value)
+  };
+  if(!data.tanggal||!data.keterangan||!data.jumlah)return alert("Lengkapi data");
+
+  editIndex===null?db.kas.push(data):db.kas[editIndex]=data;
+  editIndex=null;
+  saveDB(db);
+  tglKas.value=ketKas.value=jumlahKas.value="";
   loadKas();
+}
+
+function editKas(i){
+  const k=getDB().kas[i];
+  tglKas.value=k.tanggal;
+  ketKas.value=k.keterangan;
+  jenisKas.value=k.jenis;
+  jumlahKas.value=k.jumlah;
+  editIndex=i;
+}
+
+function hapusKas(i){
+  if(!confirm("Hapus data?"))return;
+  const db=getDB();
+  db.kas.splice(i,1);
+  saveDB(db);
+  loadKas();
+}
+
+function previewPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  doc.text("REKAP KAS",105,15,{align:"center"});
+  doc.autoTable({
+    startY:25,
+    head:[["Tanggal","Keterangan","Masuk","Keluar"]],
+    body:[...document.querySelectorAll("#listKas tr")].map(tr=>
+      [...tr.children].slice(0,4).map(td=>td.innerText))
+  });
+  pdfBlob=doc.output("blob");
+  pdfURL=URL.createObjectURL(pdfBlob);
+  pdfPreview.src=pdfURL;
+}
+
+function downloadPDF(){
+  if(!pdfURL)return alert("Preview dulu!");
+  const a=document.createElement("a");
+  a.href=pdfURL;
+  a.download="rekap_kas.pdf";
+  a.click();
+}
+
+function exportWA(){
+  let t="*REKAP KAS*\n\n";
+  document.querySelectorAll("#listKas tr").forEach(tr=>{
+    t+=tr.innerText.replace(/\t/g," | ")+"\n";
+  });
+  window.open("https://wa.me/?text="+encodeURIComponent(t));
+}
+
+loadKas();
 </script>
 
 </body>
