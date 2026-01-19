@@ -82,33 +82,37 @@ function addFooter(doc){
 function exportKasPDF(bulanTahun="Semua Bulan"){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p","mm","a4");
-  const db = getDB();
-  const kas = db.kas || [];
 
-  const masuk = kas.filter(k => k.jenis==="MASUK").reduce((a,b)=>a+(Number(b.jumlah)||0),0);
-  const keluar = kas.filter(k => k.jenis==="KELUAR").reduce((a,b)=>a+(Number(b.jumlah)||0),0);
+  const kas = getKasReal();
+
+  const masuk = kas
+    .filter(k=>k.jenis==="MASUK")
+    .reduce((a,b)=>a+b.jumlah,0);
+
+  const keluar = kas
+    .filter(k=>k.jenis==="KELUAR")
+    .reduce((a,b)=>a+b.jumlah,0);
+
   const saldo = masuk - keluar;
 
-  addHeader(doc, "LAPORAN KAS KOPERASI", `Bulan: ${bulanTahun}`);
+  addHeader(doc,"LAPORAN KAS KOPERASI",`Bulan: ${bulanTahun}`);
 
-  // Keterangan
   doc.setFontSize(11);
   doc.text(`Kas Masuk   : ${rupiah(masuk)}`,14,36);
   doc.text(`Kas Keluar  : ${rupiah(keluar)}`,14,42);
   doc.text(`Saldo Akhir : ${rupiah(saldo)}`,14,48);
 
-  // Tabel
   doc.autoTable({
     startY:55,
     head:[["Tanggal","Keterangan","Masuk","Keluar"]],
-    body: kas.map(k=>[
-      k.tanggal||"-",
-      k.keterangan||"-",
+    body:kas.map(k=>[
+      k.tanggal || "-",
+      k.keterangan,
       k.jenis==="MASUK"?rupiah(k.jumlah):"-",
       k.jenis==="KELUAR"?rupiah(k.jumlah):"-"
     ]),
-    styles:{fontSize:10, cellPadding:3},
-    headStyles:{fillColor:[41,128,185],textColor:255,fontStyle:"bold"},
+    styles:{fontSize:10,cellPadding:3},
+    headStyles:{fillColor:[41,128,185],textColor:255},
     alternateRowStyles:{fillColor:[245,245,245]},
     margin:{left:14,right:14}
   });
@@ -116,7 +120,6 @@ function exportKasPDF(bulanTahun="Semua Bulan"){
   addFooter(doc);
   previewPDF(doc);
 }
-
 /* =====================
    LAPORAN PINJAMAN SEMUA
 ===================== */
@@ -238,4 +241,48 @@ function exportPinjamanFilterPDF(){
 
   addFooter(doc);
   previewPDF(doc);
+}
+function getKasReal(){
+  const db = getDB();
+  let kas = [];
+
+  /* =====================
+     KAS MANUAL
+  ===================== */
+  (db.kas || []).forEach(k=>{
+    kas.push({
+      tanggal: k.tanggal,
+      keterangan: k.keterangan || "Kas Manual",
+      jenis: k.jenis,
+      jumlah: Number(k.jumlah) || 0
+    });
+  });
+
+  /* =====================
+     PINJAMAN CAIR (KELUAR)
+  ===================== */
+  (db.pinjaman || []).forEach(p=>{
+    kas.push({
+      tanggal: p.tanggal,
+      keterangan: `Pinjaman ${p.nama}`,
+      jenis: "KELUAR",
+      jumlah: Number(p.jumlah) || 0
+    });
+  });
+
+  /* =====================
+     ANGSURAN (MASUK)
+  ===================== */
+  (db.transaksi || []).forEach(t=>{
+    if(t.jenis === "ANGSURAN"){
+      kas.push({
+        tanggal: t.tanggal,
+        keterangan: `Angsuran ${t.nama}`,
+        jenis: "MASUK",
+        jumlah: Number(t.jumlah) || 0
+      });
+    }
+  });
+
+  return kas;
 }
