@@ -1,219 +1,50 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pinjaman & Angsuran</title>
-
-  <style>
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:#f4f6f9;
-      font-size:14px;
-    }
-
-    header{
-      background:#1e90ff;
-      color:white;
-      padding:12px 15px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    header h3{margin:0;font-size:16px;}
-    header button{
-      background:#ff5252;
-      border:none;
-      color:white;
-      padding:7px 12px;
-      border-radius:6px;
-      cursor:pointer;
-    }
-
-    .container{padding:15px;}
-
-    .tabs{
-      display:flex;
-      gap:10px;
-      margin-bottom:15px;
-    }
-    .tabs button{
-      flex:1;
-      padding:10px;
-      border:none;
-      border-radius:8px;
-      background:#e0e0e0;
-      font-weight:bold;
-      cursor:pointer;
-    }
-    .tabs button.active{
-      background:#1e90ff;
-      color:white;
-    }
-
-    .card{
-      background:white;
-      padding:15px;
-      border-radius:10px;
-      margin-bottom:15px;
-      box-shadow:0 3px 8px rgba(0,0,0,.08);
-    }
-
-    form select, form input{
-      width:100%;
-      padding:10px;
-      margin:6px 0;
-      border-radius:6px;
-      border:1px solid #ccc;
-    }
-    form button{
-      width:100%;
-      padding:11px;
-      border:none;
-      border-radius:8px;
-      font-weight:bold;
-      background:#1e90ff;
-      color:white;
-      cursor:pointer;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:13px;
-    }
-    th, td{
-      padding:8px;
-      border:1px solid #ddd;
-      text-align:center;
-    }
-    th{background:#f1f1f1;}
-
-    .btn-export{
-      width:100%;
-      margin-top:10px;
-      padding:10px;
-      border:none;
-      border-radius:8px;
-      background:#4caf50;
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    .tabcontent{display:none;}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pinjaman</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-
 <header>
-  <h3>📌 Pinjaman & Angsuran</h3>
+  <h3>📌 Data Pinjaman</h3>
   <button onclick="location.href='dashboard.html'">Dashboard</button>
 </header>
 
 <div class="container">
 
-  <!-- TAB -->
-  <div class="tabs">
-    <button class="tablink active" onclick="openTab('pinjaman')">Pinjaman</button>
-    <button class="tablink" onclick="openTab('bayar')">Bayar Angsuran</button>
-  </div>
+<form id="formPinjaman">
+  <select id="anggotaPinjam" required>
+    <option value="">-- Pilih Anggota --</option>
+  </select>
 
-  <!-- TAB PINJAMAN -->
-  <div id="pinjaman" class="tabcontent" style="display:block">
-    <div class="card">
-      <form onsubmit="simpanPinjaman(event)">
-        <h4>📌 Tambah Pinjaman</h4>
+  <input type="number" id="jumlahPinjam" placeholder="Jumlah Pinjaman" required>
+  <input type="number" id="bungaPinjam" placeholder="Bunga (%)" required>
+  <input type="number" id="tenorPinjam" placeholder="Tenor (bulan)" required>
+  <input type="text" id="angsuranPinjam" placeholder="Angsuran / bulan" readonly>
 
-        <select id="anggotaPinjam" required>
-          <option value="">-- Pilih Anggota --</option>
-        </select>
+  <button type="submit">💾 Simpan Pinjaman</button>
+</form>
 
-        <input type="number" id="jumlahPinjam" placeholder="Jumlah Pinjaman (Pokok)" required>
-        <input type="number" id="tenorPinjam" placeholder="Tenor (bulan)" required>
-        <input type="text" id="angsuranPinjam" placeholder="Angsuran / bulan" readonly>
-
-        <button type="submit">💾 Simpan Pinjaman</button>
-      </form>
-    </div>
-
-    <div class="card">
-      <h4>📋 Daftar Pinjaman</h4>
-
-      <select id="filterAnggotaPinjam">
-        <option value="">-- Semua Anggota --</option>
-      </select>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Anggota</th>
-            <th>Pokok</th>
-            <th>Bunga</th>
-            <th>Tenor</th>
-            <th>Total Bayar</th>
-            <th>Sisa</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="listPinjaman"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- TAB BAYAR -->
-  <div id="bayar" class="tabcontent">
-    <div class="card">
-      <form onsubmit="simpanAngsuran(event)">
-        <h4>💰 Bayar Angsuran</h4>
-
-        <select id="anggotaBayar" onchange="loadPinjamanDropdown()" required>
-          <option value="">-- Pilih Anggota --</option>
-        </select>
-
-        <select id="pinjamanBayar" required>
-          <option value="">-- Pilih Pinjaman --</option>
-        </select>
-
-        <input type="number" id="jumlahBayar" placeholder="Jumlah Bayar (Pokok)" required>
-
-        <button type="submit">💾 Simpan Angsuran</button>
-      </form>
-    </div>
-
-    <div class="card">
-      <h4>📋 Riwayat Angsuran</h4>
-
-      <select id="filterAnggotaBayar">
-        <option value="">-- Semua Anggota --</option>
-      </select>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Anggota</th>
-            <th>Pokok</th>
-            <th>Bunga</th>
-            <th>Tanggal</th>
-          </tr>
-        </thead>
-        <tbody id="listBayar"></tbody>
-      </table>
-    </div>
-  </div>
+<h4>📋 Daftar Pinjaman</h4>
+<table>
+<thead>
+<tr>
+  <th>Anggota</th>
+  <th>Total</th>
+  <th>Tenor</th>
+  <th>Sisa</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody id="listPinjaman"></tbody>
+</table>
 
 </div>
 
-<!-- LIBRARY -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-<!-- CORE JS -->
 <script src="js/storage.js"></script>
-<script src="js/auth.js"></script>
 <script src="js/pinjaman.js"></script>
-
 </body>
 </html>

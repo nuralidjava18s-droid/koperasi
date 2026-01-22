@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angsuran</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<header>
+  <h3>💰 Bayar Angsuran</h3>
+  <button onclick="location.href='dashboard.html'">Dashboard</button>
+</header>
+
+<div class="container">
+
+<form id="formAngsuran">
+  <select id="anggotaBayar" required></select>
+  <select id="pinjamanBayar" required></select>
+  <input type="number" id="jumlahBayar" placeholder="Jumlah Bayar" required>
+  <button type="submit">💾 Simpan</button>
+</form>
+
+<h4>📋 Riwayat Angsuran</h4>
+<table>
+<thead>
+<tr>
+  <th>Anggota</th>
+  <th>Jumlah</th>
+  <th>Tanggal</th>
+</tr>
+</thead>
+<tbody id="listBayar"></tbody>
+</table>
+
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/angsuran.js"></script>
+</body>
+</html>

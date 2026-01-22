@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Simpanan</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
+  font-size:14px;
+}
+header{
+  background:#1e90ff;
+  color:white;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h3{margin:0;font-size:16px;}
+header button{
+  background:#ff5252;
+  border:none;
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+}
+
+.container{padding:15px;}
+
+.filter{
+  background:white;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+.filter select{
+  width:100%;
+  padding:10px;
+  margin-bottom:8px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+}
+th,td{
+  padding:8px;
+  border:1px solid #ddd;
+  text-align:center;
+}
+th{background:#f1f1f1;}
+
+.total{
+  margin-top:10px;
+  background:#e3f2fd;
+  padding:10px;
+  border-radius:8px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h3>📊 Laporan Simpanan</h3>
+  <button onclick="location.href='dashboard.html'">Dashboard</button>
+</header>
+
+<div class="container">
+
+  <!-- FILTER -->
+  <div class="filter">
+    <select id="filterAnggota" onchange="loadSimpananFilter()">
+      <option value="">-- Semua Anggota --</option>
+    </select>
+
+    <select id="filterJenis" onchange="loadSimpananFilter()">
+      <option value="">-- Semua Jenis Simpanan --</option>
+      <option value="Pokok">Simpanan Pokok</option>
+      <option value="Wajib">Simpanan Wajib</option>
+      <option value="Sukarela">Simpanan Sukarela</option>
+    </select>
+  </div>
+
+  <!-- TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Anggota</th>
+        <th>Jenis</th>
+        <th>Jumlah</th>
+      </tr>
+    </thead>
+    <tbody id="listSimpanan"></tbody>
+  </table>
+
+  <div class="total">
+    Total Simpanan: <span id="totalSimpanan">Rp 0</span>
+  </div>
+
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/lap_simpanan.js"></script>
+<script>
+  cekLogin();
+  loadFilterAnggota();
+  loadSimpananFilter();
+</script>
+
+</body>
+</html>

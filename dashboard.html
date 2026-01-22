@@ -1,112 +1,22 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Koperasi</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Koperasi</title>
 
-  <style>
-  body {
-  font-size: 14px;
+<!-- CSS -->
+<style>
+*{ box-sizing:border-box }
+
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
+  font-size:14px;
 }
 
-header h3 {
-  font-size: 16px;
-}
-
-.card h3 {
-  font-size: 16px;
-}
-
-.card p {
-  font-size: 12px;
-}
-
-.summary .box {
-  font-size: 14px;
-}
-
-#kasMasukDashboard, #kasKeluarDashboard, #saldoKasDashboard {
-  font-size: 16px;
-}
-
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:#f4f6f9;
-    }
-
-    header{
-      background:#1e90ff;
-      color:white;
-      padding:15px 20px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-
-    header h2{ margin:0; }
-
-    header button{
-      background:#ff5252;
-      border:none;
-      color:white;
-      padding:8px 14px;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .container{ padding:20px; }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:15px;
-    }
-
-    .card{
-      background:white;
-      padding:20px;
-      border-radius:12px;
-      box-shadow:0 4px 10px rgba(0,0,0,.1);
-      cursor:pointer;
-      transition:.2s;
-      text-align:center;
-    }
-
-    .card:hover{
-      transform:translateY(-4px);
-      box-shadow:0 6px 14px rgba(0,0,0,.15);
-    }
-
-    .card h3{ margin:10px 0 5px; }
-    .card p{ margin:0; color:#555; font-size:14px; }
-
-    .saldo{
-      background:#1e90ff;
-      color:white;
-      cursor:default;
-    }
-
-    .saldo p{
-      color:white;
-      font-size:10px;
-      font-weight:bold;
-    }
-.summary{
-  display:flex;
-  gap:10px;
-  margin:15px 0;
-}
-.summary .box{
-  flex:1;
-  background:white;
-  padding:15px;
-  border-radius:8px;
-  text-align:center;
-  font-weight:bold;
-}
+/* NAVBAR */
 .navbar{
   background:#1e90ff;
   color:white;
@@ -121,187 +31,185 @@ header h3 {
   align-items:center;
   gap:12px;
 }
-
-.logo{
-  height:42px;
-  width:auto;
-  display:block;
+.logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid #fff;
 }
 
+
 .brand-text{
-  display:flex;
-  flex-direction:column;
   line-height:1.1;
 }
 
 .brand-text .subtitle{
-  font-size:15px;
-  opacity:0.9;
+  font-size:14px;
+  opacity:.9;
 }
 
 .brand-text .title{
-  font-size:22px;centre;
+  font-size:20px;
   font-weight:bold;
-  letter-spacing:1px;
 }
 
-/* Tombol logout */
+/* CONTAINER */
+.container{
+  padding:15px;
+}
+
+/* SUMMARY */
+.summary{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.summary .box{
+  flex:1;
+  background:white;
+  padding:12px;
+  border-radius:8px;
+  text-align:center;
+  font-weight:bold;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:15px;
+}
+
+/* CARD */
+.card{
+  background:white;
+  padding:18px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+  cursor:pointer;
+  text-align:center;
+  transition:.2s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+}
+
+/* BUTTON */
 .nav-right button{
   background:#ff5252;
   border:none;
   color:white;
   padding:7px 12px;
   border-radius:6px;
-  font-size:13px;
   cursor:pointer;
 }
-  .tabs{
-  display:flex;
-  gap:10px;
-  margin-bottom:15px;
-}
-.tabs button{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:#e0e0e0;
-  font-weight:bold;
-}
-.tabs button.active{
-  background:#1e90ff;
-  color:white;
-}
-  </style>
- 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</style>
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
-  
+
 <body>
+
 <header class="navbar">
   <div class="nav-left">
-    <img src="img/logo.jpg" alt="Logo Koperasi" class="logo">
-
+    <img src="img/ims.png" class="logo" alt="logo">
     <div class="brand-text">
-      <span class="subtitle">Koperasi Driver</span>
-      <span class="title">ARFA</span>
+      <div class="subtitle">Koperasi Driver</div>
+      <div class="title">ARFA</div>
     </div>
   </div>
-
   <div class="nav-right">
     <button onclick="logout()">Logout</button>
   </div>
 </header>
-  <div class="container">
+
+<div class="container">
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <div class="box" style="background:#e8f5e9">
+      ⬇️ Kas Masuk<br>
+      <b id="kasMasukDashboard">Rp 0</b>
+    </div>
+    <div class="box" style="background:#ffebee">
+      ⬆️ Kas Keluar<br>
+      <b id="kasKeluarDashboard">Rp 0</b>
+    </div>
+    <div class="box" style="background:#e3f2fd">
+      💰 Saldo Akhir<br>
+      <b id="saldoKasDashboard">Rp 0</b>
+    </div>
+  </div>
+
+  <!-- MENU -->
   <div class="grid">
 
-    <!-- TOTAL SALDO -->
-    <div class="summary" style="display:flex; gap:12px;">
-  
-  <div class="box" style="background:#e8f5e9; flex:1;">
-    ⬇️ Kas Masuk<br>
-    <b id="kasMasukDashboard" style="font-size:20px;color:green">Rp 0</b>
-  </div>
-
-  <div class="box" style="background:#ffebee; flex:1;">
-    ⬆️ Kas Keluar<br>
-    <b id="kasKeluarDashboard" style="font-size:20px;color:red">Rp 0</b>
-  </div>
-
-  <div class="box" style="background:#e3f2fd; flex:1;">
-    💰 Saldo Akhir<br>
-    <b id="saldoKasDashboard" style="font-size:22px">Rp 0</b>
-  </div>
-
-</div>
     <div class="card" onclick="location.href='input_kas.html'">
-      <h3>💰 Input Kas</h3>
-      <p>Input kas masuk & keluar</p>
-      
-    </div>
-    <div class="card" onclick="location.href='anggota.html'">
-      <h3>👤 Anggota</h3>
-      <p>Data anggota koperasi</p>
+      💰<br><b>Input Kas</b><br>
+      <small>Kas masuk & keluar</small>
     </div>
 
-     <div class="card" onclick="location.href='backup.html'">
-      <h3>💾 Backup & Restore</h3>
-      <p>backup & restore</p>
+    <div class="card" onclick="location.href='anggota.html'">
+      👤<br><b>Anggota</b><br>
+      <small>Data anggota</small>
     </div>
 
     <div class="card" onclick="location.href='simpanan.html'">
-      <h3>💾 Simpanan</h3>
-      <p>Simpanan anggota</p>
+      🏦<br><b>Simpanan</b><br>
+      <small>Simpanan anggota</small>
     </div>
 
     <div class="card" onclick="location.href='pinjaman.html'">
-      <h3>🔁 Pinjaman dan bayar</h3>
-      <p>Pinjaman & bayar pinjaman</p>
+      🔁<br><b>Pinjaman</b><br>
+      <small>Data pinjaman</small>
     </div>
-    
-    <div class="card" onclick="location.href='lap_anggota.html'">
-      <h3>📊 Laporan anggota</h3>
-      <p>Rekap & export</p>
+
+    <div class="card" onclick="location.href='angsuran.html'">
+      💳<br><b>Angsuran</b><br>
+      <small>Bayar pinjaman</small>
     </div>
-    
+
+    <div class="card" onclick="location.href='list_laporan_v2.html'">
+      📊<br><b>Laporan</b><br>
+      <small>Rekap data</small>
+    </div>
+
     <div class="card" onclick="location.href='laporan.html'">
-      <h3>📊 Laporan pdf</h3>
-      <p>kirim laporan pdf</p>
+      🧾<br><b>Laporan PDF</b><br>
+      <small>Kirim PDF</small>
     </div>
-    
-  </div>
-    <div id="pdfPreview" style="display:none;margin-top:20px">
-      <iframe id="pdfFrame" style="width:100%;height:500px;border:1px solid #ccc"></iframe>
+
+    <div class="card" onclick="location.href='backup.html'">
+      💾<br><b>Backup</b><br>
+      <small>Backup & restore</small>
     </div>
+
   </div>
-<script>
-  cekLogin();
+</div>
 
-  function rupiah(n){
-    return "Rp " + (Number(n)||0).toLocaleString("id-ID");
-  }
-  function loadDashboard(){
-  const db = getDB();
-  let saldo = 0;
-
-  // SIMPANAN = MASUK
-  db.simpanan.forEach(s=>{
-    saldo += Number(s.jumlah);
-  });
-
-  // ANGSURAN = MASUK
-  db.transaksi
-    .filter(t=>t.jenis==="BAYAR")
-    .forEach(t=>{
-      saldo += Number(t.jumlah);
-    });
-
-  // PINJAMAN = KELUAR
-  db.pinjaman.forEach(p=>{
-    saldo -= Number(p.jumlah);
-  });
-
-  document.getElementById("totalSaldo").innerText =
-    "Rp " + saldo.toLocaleString("id-ID");
-}
-
-  function logout(){
-    if(confirm("Yakin ingin logout?")){
-      localStorage.removeItem("login");
-      location.href = "index.html";
-    }
-  }
-
-  loadDashboard();
-</script>
-<!-- SCRIPT -->
+<!-- SCRIPT FILE -->
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/export_laporan.js"></script>
 
-</body>
-</html>
+<!-- INIT -->
+<script>
+cekLogin();
+loadDashboard();
+
+function logout(){
+  if(confirm("Yakin ingin logout?")){
+    localStorage.removeItem("login");
+    location.href="index.html";
+  }
+}
+</script>
+
 </body>
 </html>
