@@ -1,0 +1,118 @@
+/* ===== RESET & GLOBAL ===== */
+*{
+  box-sizing:border-box;
+}
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f9;
+  font-size:14px;
+  color:#333;
+}
+
+/* ===== HEADER ===== */
+header{
+  background:#1e90ff;
+  color:#fff;
+  padding:12px 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h3{
+  margin:0;
+  font-size:16px;
+}
+header button{
+  background:#ff5252;
+  border:none;
+  color:white;
+  padding:7px 12px;
+  border-radius:6px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+/* ===== CONTAINER ===== */
+.container{
+  padding:15px;
+}
+
+/* ===== FORM ===== */
+form{
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 3px 8px rgba(0,0,0,.08);
+  margin-bottom:15px;
+}
+form select,
+form input{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+form input[readonly]{
+  background:#f1f1f1;
+}
+form button{
+  width:100%;
+  padding:11px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  background:#1e90ff;
+  color:white;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+/* ===== SECTION TITLE ===== */
+h4{
+  margin:10px 0;
+  font-size:15px;
+}
+
+/* ===== TABLE ===== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 3px 8px rgba(0,0,0,.08);
+}
+th, td{
+  padding:8px;
+  border:1px solid #e0e0e0;
+  text-align:center;
+  font-size:13px;
+}
+th{
+  background:#f1f1f1;
+  font-weight:bold;
+}
+
+/* ===== STATUS COLOR ===== */
+.status-lunas{
+  color:green;
+  font-weight:bold;
+}
+.status-belum{
+  color:red;
+  font-weight:bold;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:480px){
+  th, td{
+    font-size:12px;
+    padding:6px;
+  }
+  header h3{
+    font-size:15px;
+  }
+}
