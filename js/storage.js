@@ -1,23 +1,22 @@
+
 /* =====================
    STORAGE KOPERASI
 ===================== */
+const STORAGE_KEY = "koperasi_db";
+
 function getDB(){
-  let db = localStorage.getItem("koperasi_db");
+  let db = localStorage.getItem(STORAGE_KEY);
 
   if(!db){
     const initDB = {
-      user: {
-        username: "Ali",
-        password: "1234"
-      },
-      anggota: [],
-      simpanan: [],
-      pinjaman: [],
-      transaksi: [],
-      kas: []
+      user:{ username:"admin", password:"1234" },
+      anggota:[],
+      simpanan:[],
+      pinjaman:[],
+      transaksi:[],
+      kas:[]
     };
-
-    localStorage.setItem("koperasi_db", JSON.stringify(initDB));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initDB));
     return initDB;
   }
 
@@ -25,7 +24,7 @@ function getDB(){
 }
 
 function saveDB(db){
-  localStorage.setItem("koperasi_db", JSON.stringify(db));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
 }
 
 function logout(){

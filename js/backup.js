@@ -20,16 +20,25 @@ function backup(){
   const blob = new Blob([data], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
+  // 🔹 Nama file otomatis (tanggal & jam)
+  const now = new Date();
+  const tgl = now.toISOString().slice(0,10); // 2026-01-18
+  const jam = now.toTimeString().slice(0,5).replace(":","-"); // 10-45
+
+  // ⬇️ SEOLAH DI DALAM FOLDER
+  const filename = `backup-koperasi-${tgl}-${jam}.json`;
+
   const a = document.createElement("a");
   a.href = url;
-  a.download = "backup_koperasi.json";
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
 
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-}
 
+  alert("✅ Backup berhasil\n" + filename);
+}
 /* =====================
    RESTORE
 ===================== */
@@ -49,16 +58,16 @@ function restore(){
     try{
       const db = JSON.parse(e.target.result);
 
-      // validasi struktur minimal
-      if(!db.user || !db.anggota){
+      // validasi minimal koperasi
+      if(!db.user || !db.anggota || !db.kas){
         alert("File backup tidak valid!");
         return;
       }
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-
+      localStorage.setItem("koperasi_db", JSON.stringify(db));
       alert("✅ Restore berhasil!");
       location.reload();
+
     }catch(err){
       alert("❌ File backup rusak / tidak valid!");
     }
