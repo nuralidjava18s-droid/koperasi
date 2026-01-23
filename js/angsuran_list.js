@@ -14,7 +14,7 @@ function loadFilterAnggota(){
 
   sel.innerHTML = `<option value="">-- Semua Anggota --</option>`;
   db.anggota.forEach(a=>{
-    sel.innerHTML += `<option value="${a.nama}">${a.nama}</option>`;
+    sel.innerHTML += `<option value="${a.id}">${a.nama}</option>`;
   });
 }
 
@@ -26,32 +26,40 @@ function loadBayar(){
   const tbody = document.getElementById("listBayar");
   if(!tbody) return;
 
-  const fNama  = document.getElementById("filterAnggotaBayar").value;
-  const fBulan = document.getElementById("filterBulanBayar").value;
+  const fAnggota = document.getElementById("filterAnggotaBayar").value;
+  const fBulan   = document.getElementById("filterBulanBayar").value;
 
   tbody.innerHTML = "";
 
-  const data = db.transaksi.filter(t=>t.jenis==="BAYAR");
-
-  if(data.length === 0){
+  if(!db.transaksi || db.transaksi.length === 0){
     tbody.innerHTML = `<tr><td colspan="4">Belum ada data angsuran</td></tr>`;
     return;
   }
 
-  data.forEach(t=>{
-    if(fNama && t.nama !== fNama) return;
+  let adaData = false;
+
+  db.transaksi.forEach(t=>{
+    if(fAnggota && t.anggota_id !== fAnggota) return;
     if(fBulan && !t.tanggal.startsWith(fBulan)) return;
 
+    const anggota = db.anggota.find(a=>a.id === t.anggota_id);
     const pin = db.pinjaman.find(p=>p.id === t.pinjamanId);
+
+    adaData = true;
 
     tbody.innerHTML += `
       <tr>
-        <td>${t.nama}</td>
-        <td>${pin ? rupiah(pin.pokok || pin.jumlah) : "-"}</td>
+        <td>${anggota?.nama || "-"}</td>
+        <td>${pin ? rupiah(pin.jumlah) : "-"}</td>
         <td>${rupiah(t.jumlah)}</td>
         <td>${t.tanggal}</td>
-      </tr>`;
+      </tr>
+    `;
   });
+
+  if(!adaData){
+    tbody.innerHTML = `<tr><td colspan="4">Data tidak ditemukan</td></tr>`;
+  }
 }
 
 /* =====================
