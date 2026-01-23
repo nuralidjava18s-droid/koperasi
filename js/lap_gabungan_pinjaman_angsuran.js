@@ -1,87 +1,73 @@
-const { jsPDF } = window.jspdf;
-
-function rupiah(n){
-  return "Rp " + Number(n||0).toLocaleString("id-ID");
-}
-
 function exportGabunganPDF(){
   const db = getDB();
+  const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p","mm","a4");
 
-  /* =====================
-     KOP
-  ===================== */
+  /* ================= HEADER ================= */
   doc.setFontSize(14);
   doc.text("KOPERASI DRIVER ARFA",105,15,{align:"center"});
   doc.setFontSize(10);
-  doc.text("Laporan Gabungan Pinjaman & Angsuran",105,22,{align:"center"});
-  doc.line(15,26,195,26);
+  doc.text("Laporan Pinjaman & Angsuran",105,21,{align:"center"});
+  doc.line(15,25,195,25);
 
-  let y = 30;
+  /* ================= PINJAMAN ================= */
+  doc.setFontSize(12);
+  doc.text("DATA PINJAMAN",105,33,{align:"center"});
 
-  /* =====================
-     LOOP PINJAMAN
-  ===================== */
-  db.pinjaman.forEach((p,idx)=>{
-    const anggota = db.anggota.find(a=>a.id === p.anggota_id);
+  let bodyPinjaman = [];
 
-    if(y > 240){
-      doc.addPage();
-      y = 20;
-    }
-
-    /* HEADER PINJAMAN */
-    doc.setFontSize(11);
-    doc.text(
-      `${idx+1}. ${anggota?.nama || "-"} | Pinjaman: ${rupiah(p.jumlah)} | Sisa: ${rupiah(p.sisa)}`,
-      15,y
-    );
-    y += 5;
-
-    /* DATA ANGSURAN */
-    const angsuran = db.transaksi.filter(t=>t.pinjamanId === p.id);
-
-    if(angsuran.length === 0){
-      doc.setFontSize(9);
-      doc.text("Belum ada angsuran",20,y);
-      y += 6;
-      return;
-    }
-
-    const body = [];
-    let totalBayar = 0;
-
-    angsuran.forEach((t,i)=>{
-      body.push([
-        i+1,
-        t.tanggal,
-        rupiah(t.jumlah)
-      ]);
-      totalBayar += Number(t.jumlah);
-    });
-
-    doc.autoTable({
-      startY:y,
-      head:[["No","Tanggal","Jumlah Bayar"]],
-      body:body,
-      styles:{fontSize:9},
-      theme:"grid",
-      margin:{left:20}
-    });
-
-    y = doc.lastAutoTable.finalY + 4;
-
-    doc.setFontSize(9);
-    doc.text("Total Dibayar: " + rupiah(totalBayar),20,y);
-    y += 8;
+  db.pinjaman.forEach((p,i)=>{
+    const a = db.anggota.find(x=>x.id===p.anggota_id);
+    bodyPinjaman.push([
+      i+1,
+      a?.nama || "-",
+      rupiah(p.jumlah),
+      p.tenor + " bln",
+      rupiah(p.sisa),
+      p.sisa<=0 ? "LUNAS" : "AKTIF"
+    ]);
   });
 
-  /* =====================
-     FOOTER
-  ===================== */
-  const tgl = new Date().toLocaleDateString("id-ID");
-  doc.setFontSize(9);
-  doc.text("Dicetak : " + tgl,150,285);
+  doc.autoTable({
+    startY:38,
+    head:[["No","Nama","Pinjaman","Tenor","Sisa","Status"]],
+    body:bodyPinjaman,
+    styles:{fontSize:9},
+    headStyles:{fillColor:[0,123,255]}
+  });
 
-  doc.save("laporan_pinjaman_dan_angsuran.pdf");
+  /* ================= ANGSURAN ================= */
+  let y = doc.lastAutoTable.finalY + 10;
+
+  doc.setFontSize(12);
+  doc.text("RIWAYAT ANGSURAN",105,y,{align:"center"});
+
+  let bodyAngsuran = [];
+
+  db.transaksi.forEach((t,i)=>{
+    const a = db.anggota.find(x=>x.id===t.anggota_id);
+    bodyAngsuran.push([
+      i+1,
+      a?.nama || "-",
+      rupiah(t.jumlah),
+      t.tanggal
+    ]);
+  });
+
+  doc.autoTable({
+    startY:y+5,
+    head:[["No","Nama","Jumlah Bayar","Tanggal"]],
+    body:bodyAngsuran,
+    styles:{fontSize:9},
+    headStyles:{fillColor:[40,167,69]}
+  });
+
+  /* ================= FOOTER ================= */
+  doc.setFontSize(9);
+  doc.text(
+    "Dicetak: " + new Date().toLocaleDateString("id-ID"),
+    150,285
+  );
+
+  doc.save("laporan_pinjaman_angsuran.pdf");
 }
