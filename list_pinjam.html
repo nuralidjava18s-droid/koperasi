@@ -96,11 +96,13 @@ th{background:#f1f1f1;}
 <button class="btn-export" onclick="exportPinjamanPDF()">📄 Export PDF</button>
 
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/pinjaman.js"></script>
-
+<script src="js/lap_pinjaman_pdf.js"></script>
+  
 <script>
 cekLogin();
 loadFilterAnggotaPinjam();
