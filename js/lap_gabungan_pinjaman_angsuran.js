@@ -106,3 +106,52 @@ function exportGabunganPDF(){
 
   doc.save("laporan_pinjaman_dan_angsuran.pdf");
 }
+function loadLaporan(){
+  const anggotaId = document.getElementById("pilihAnggota").value;
+  if(!anggotaId) return;
+
+  const db = getDB();
+  const tbody = document.getElementById("listLaporan");
+  tbody.innerHTML = "";
+
+  let totalPinjam = 0;
+  let totalBayar  = 0;
+  let sisa = 0;
+
+  /* PINJAMAN */
+  db.pinjaman
+    .filter(p => p.anggota_id == anggotaId) // ⬅️ FIX
+    .forEach(p=>{
+      totalPinjam += p.jumlah;
+      sisa += p.sisa;
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${p.tanggal}</td>
+          <td>Pinjaman</td>
+          <td class="out">${rupiah(p.jumlah)}</td>
+          <td>-</td>
+        </tr>`;
+    });
+
+  /* ANGSURAN */
+  db.transaksi
+    .filter(t => t.anggota_id == anggotaId) // ⬅️ FIX
+    .forEach(t=>{
+      totalBayar += t.jumlah;
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${t.tanggal}</td>
+          <td>Angsuran</td>
+          <td>-</td>
+          <td class="in">${rupiah(t.jumlah)}</td>
+        </tr>`;
+    });
+
+  totalPinjaman.innerText = rupiah(totalPinjam);
+  totalBayarEl.innerText  = rupiah(totalBayar);
+  sisaPinjaman.innerText = rupiah(sisa);
+  statusPinjaman.innerText = sisa <= 0 ? "LUNAS" : "BELUM LUNAS";
+  statusPinjaman.className = sisa <= 0 ? "status-lunas" : "status-belum";
+}
