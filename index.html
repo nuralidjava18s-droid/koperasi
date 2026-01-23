@@ -4,23 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Koperasi</title>
-<style>
-    body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  min-height:100vh;
 
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  background:
-    linear-gradient(
-      rgba(0,0,0,.45),
-      rgba(0,0,0,.45)
-    ),
-    url("koperasi/img/bg-login.jpg")
-    }
+  <style>
+  
  body{
   margin:0;
   font-family:Arial, sans-serif;
@@ -32,7 +18,7 @@
 
   background:
     linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
-    url("/koperasi/img/bg-login.jpg") center/cover no-repeat;
+    url("img/bg-login.jpg") center/cover no-repeat;
 }
 
 .login{
@@ -80,26 +66,28 @@
   color: rgba(255,255,255,0.85);
   letter-spacing: 0.5px;
 }
+  .error {
+  display: none;
+}
+
   </style>
 </head>
 <body>
-<div class="footer-login">
-  © 2026 Koperasi Driver Arfa • Nur ali
-</div>
+  
+<div class="footer-login"></div>
   <div class="login">
     <h2>KOPERASI</h2>
-
     <input type="text" id="username" placeholder="Username">
     <input type="password" id="password" placeholder="Password">
-
     <button onclick="login()">LOGIN</button>
-
     <div class="error" id="error">Username atau password salah</div>
   </div>
 
   <!-- SCRIPT -->
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
-
+<div class="footer-login">
+  © 2026 Koperasi Driver Arfa • Sistem Informasi Koperasi by Nur ali
+</div>
 </body>
 </html>
