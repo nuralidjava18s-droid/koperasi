@@ -105,7 +105,7 @@ function exportPDF(){
 
   doc.save("laporan_"+anggota.nama+".pdf");
 }
-function exportWADetail(){
+function exportWAtoNumber(noWA){
   const anggotaId = pilihAnggota.value;
   if(!anggotaId){
     alert("Pilih anggota dulu");
@@ -120,33 +120,17 @@ function exportWADetail(){
 *Koperasi Driver ARFA*
 
 👤 Nama : ${anggota.nama}
-——————————————
-`;
 
-  // PINJAMAN
-  db.pinjaman
-    .filter(p => p.anggota_id == anggotaId)
-    .forEach(p=>{
-      text += `📌 Pinjaman ${p.tanggal}\n💰 ${rupiah(p.jumlah)}\n`;
-    });
+💰 Total Pinjaman : ${totalPinjaman.innerText}
+💵 Total Bayar     : ${totalBayarEl.innerText}
+📉 Sisa Pinjaman   : ${sisaPinjaman.innerText}
+📌 Status          : ${statusPinjaman.innerText}
 
-  text += "——————————————\n";
-
-  // ANGSURAN
-  db.transaksi
-    .filter(t => t.anggota_id == anggotaId)
-    .forEach(t=>{
-      text += `💵 Bayar ${t.tanggal}\n➡️ ${rupiah(t.jumlah)}\n`;
-    });
-
-  text +=
-`——————————————
-📉 Sisa : ${sisaPinjaman.innerText}
-📌 Status : ${statusPinjaman.innerText}
+📅 Dicetak : ${new Date().toLocaleDateString("id-ID")}
 `;
 
   window.open(
-    "https://wa.me/?text=" + encodeURIComponent(text),
+    `https://wa.me/${noWA}?text=${encodeURIComponent(text)}`,
     "_blank"
   );
 }
