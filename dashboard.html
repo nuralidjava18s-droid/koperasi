@@ -42,25 +42,35 @@ body{
   gap:12px;
 }
 
-.logo{
-  width:42px;
-  height:42px;
-  object-fit:contain;
-  border-radius:8px;
-  background:white;
-  padding:4px;
+
+.navbar-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
+.logo{
+  width:48px;
+  height:48px;
+  border-radius:50%;        /* bikin BULAT */
+  object-fit:cover;         /* isi penuh lingkaran */
+  background:#fff;
+  padding:3px;
+  border:2px solid #fff;    /* opsional, biar elegan */
+}
+
 
 .brand-text{
   line-height:1.1;
 }
 
 .brand-text .subtitle{
-  font-size:13px;
+  font-size:18px;
+  text-align:center;
   opacity:.9;
 }
 
 .brand-text .title{
+  text-align:center;
   font-size:20px;
   font-weight:700;
   letter-spacing:.5px;
@@ -160,8 +170,8 @@ body{
   <div class="nav-left">
     <img src="img/ims.png" class="logo" alt="logo">
     <div class="brand-text">
-      <div class="subtitle">Koperasi Driver</div>
-      <div class="title">ARFA</div>
+      <div class="subtitle">Koperasi</div>
+      <div class="title">ARFA DRIVER</div>
     </div>
   </div>
   <div class="nav-right">
@@ -218,7 +228,9 @@ body{
     <div class="card" onclick="location.href='list_laporan_v2.html'">
       📊<br><b>Laporan</b><br>
       <small>Rekap data</small>
-    </div> 
+    </div>
+
+
     <div class="card" onclick="location.href='backup.html'">
       💾<br><b>Backup</b><br>
       <small>Backup & restore</small>
