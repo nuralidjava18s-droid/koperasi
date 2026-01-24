@@ -64,8 +64,10 @@ th{background:#f1f1f1;}
 <body>
 
 <header>
-  <h3>📌 Daftar Pinjaman</h3>
+  <h3>📌 List Pinjaman</h3>
   <button onclick="location.href='dashboard.html'">Dashboard</button>
+   <button onclick="location.href='list_laporan_v2.html'">back</button>
+
 </header>
 
 <div class="container">
@@ -92,21 +94,27 @@ th{background:#f1f1f1;}
   </thead>
   <tbody id="listPinjaman"></tbody>
 </table>
+<select id="filterAnggotaPinjaman" onchange="loadPinjaman()">
+  <option value="">-- Semua Anggota --</option>
+</select>
 
-<button class="btn-export" onclick="exportPinjamanPDF()">📄 Export PDF</button>
-
+<div style="margin:10px 0; display:flex; gap:10px">
+  <button onclick="exportPinjamanPDF()">📄 Export PDF</button>
+  <button onclick="exportPinjamanWA()">📲 Kirim WA</button>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</div>
+
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/pinjaman.js"></script>
-<script src="js/lap_pinjaman_pdf.js"></script>
-  
+
 <script>
-cekLogin();
-loadFilterAnggotaPinjam();
-loadPinjaman();
+  document.addEventListener("DOMContentLoaded", () => {
+  loadAnggota();
+  loadFilterAnggota();
+  loadPinjaman();
+    cekLogin();
+    loadFilterAnggotaPinjam();
 </script>
 
 </body>

@@ -72,15 +72,17 @@
 </header>
 
 <div class="container">
-  <button onclick="backup()">⬇️ Backup Data</button>
+ </div>
+  
+<button onclick="backupToFile()">Backup ke Download</button>
 
-  <hr>
+<hr>
 
-  <input type="file" id="fileRestore">
-  <br><br>
-  <button onclick="restore()">⬆️ Restore Data</button>
-</div>
+<input type="file" id="restoreFile" accept=".json">
+<button onclick="restoreFromFile()">Restore dari File</button>
 
+<script src="backup.js"></script>
+<script src="backup.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/backup.js"></script>
 </body>
