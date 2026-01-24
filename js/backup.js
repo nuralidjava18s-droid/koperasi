@@ -1,13 +1,38 @@
 /* =====================
    BACKUP & RESTORE
-   SINKRON STORAGE
 ===================== */
-
-const STORAGE_KEY = "koperasi_db";
 
 /* =====================
    BACKUP
 ===================== */
+async function restore(){
+  try{
+    const [handle] = await window.showOpenFilePicker({
+      types: [{
+        description: "Backup Koperasi",
+        accept: { "application/json": [".json"] }
+      }]
+    });
+
+    const file = await handle.getFile();
+    const text = await file.text();
+    let db = JSON.parse(text);
+
+    db.user ??= { username:"admin", password:"1234" };
+    db.anggota ??= [];
+    db.simpanan ??= [];
+    db.pinjaman ??= [];
+    db.transaksi ??= [];
+    db.kas ??= [];
+
+    localStorage.setItem("koperasi_db", JSON.stringify(db));
+    alert("✅ Restore berhasil!");
+    location.reload();
+
+  }catch(e){
+    alert("❌ Restore dibatalkan");
+  }
+}
 function backup(){
   const db = getDB();
 
@@ -20,12 +45,10 @@ function backup(){
   const blob = new Blob([data], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
-  // 🔹 Nama file otomatis (tanggal & jam)
   const now = new Date();
-  const tgl = now.toISOString().slice(0,10); // 2026-01-18
-  const jam = now.toTimeString().slice(0,5).replace(":","-"); // 10-45
+  const tgl = now.toISOString().slice(0,10);
+  const jam = now.toTimeString().slice(0,5).replace(":","-");
 
-  // ⬇️ SEOLAH DI DALAM FOLDER
   const filename = `backup-koperasi-${tgl}-${jam}.json`;
 
   const a = document.createElement("a");
@@ -33,20 +56,19 @@ function backup(){
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
   alert("✅ Backup berhasil\n" + filename);
 }
+
 /* =====================
    RESTORE
 ===================== */
 function restore(){
   const input = document.getElementById("fileRestore");
-  const file = input.files[0];
 
-  if(!file){
+  if(!input || !input.files.length){
     alert("Pilih file backup terlebih dahulu!");
     return;
   }
@@ -54,24 +76,31 @@ function restore(){
   if(!confirm("⚠️ Data lama akan DIGANTI. Lanjutkan?")) return;
 
   const reader = new FileReader();
-  reader.onload = function(e){
+  reader.onload = e=>{
     try{
-      const db = JSON.parse(e.target.result);
+      let db = JSON.parse(e.target.result);
 
-      // validasi minimal koperasi
-      if(!db.user || !db.anggota || !db.kas){
+      if(!db || typeof db !== "object"){
         alert("File backup tidak valid!");
         return;
       }
+
+      // normalisasi struktur koperasi
+      db.user ??= { username:"admin", password:"1234" };
+      db.anggota ??= [];
+      db.simpanan ??= [];
+      db.pinjaman ??= [];
+      db.transaksi ??= [];
+      db.kas ??= [];
 
       localStorage.setItem("koperasi_db", JSON.stringify(db));
       alert("✅ Restore berhasil!");
       location.reload();
 
     }catch(err){
-      alert("❌ File backup rusak / tidak valid!");
+      alert("❌ File backup rusak!");
     }
   };
 
-  reader.readAsText(file);
+  reader.readAsText(input.files[0]);
 }
