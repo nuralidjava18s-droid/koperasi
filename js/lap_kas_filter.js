@@ -16,11 +16,14 @@ function loadKasFilter(){
   let kasKeluar = 0;
 
   tbody.innerHTML = "";
+  filteredKas = [];
 
   (db.kas || [])
     .filter(k => !fJenis || k.jenis === fJenis)
     .filter(k => !fKet || k.keterangan.toLowerCase().includes(fKet))
     .forEach(k=>{
+      filteredKas.push(k);
+
       if(k.jenis === "MASUK"){
         kasMasuk += Number(k.jumlah);
       }else{

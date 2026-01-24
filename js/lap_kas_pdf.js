@@ -1,24 +1,14 @@
+const { jsPDF } = window.jspdf;
+
 function exportKasPDF(){
 
-  const db = getDB();
-
-  // ambil filter aktif
-  const fKet   = document.getElementById("filterKet")?.value.toLowerCase() || "";
-  const fJenis = document.getElementById("filterJenis")?.value || "";
-
-  const data = (db.kas || [])
-    .filter(k => !fJenis || k.jenis === fJenis)
-    .filter(k => !fKet || k.keterangan.toLowerCase().includes(fKet));
-
-  if(data.length === 0){
+  if(!filteredKas || filteredKas.length === 0){
     alert("Tidak ada data untuk diexport");
     return;
   }
 
-  const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p","mm","a4");
 
-  /* ===== HEADER ===== */
   doc.setFontSize(14);
   doc.text("KOPERASI DRIVER ARFA",105,15,{align:"center"});
   doc.setFontSize(10);
@@ -32,7 +22,7 @@ function exportKasPDF(){
   let masuk = 0;
   let keluar = 0;
 
-  data.forEach((k,i)=>{
+  filteredKas.forEach((k,i)=>{
     body.push([
       i+1,
       k.tanggal,

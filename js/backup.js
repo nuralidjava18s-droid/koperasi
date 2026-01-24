@@ -1,106 +1,69 @@
-/* =====================
-   BACKUP & RESTORE
-===================== */
+/* =========================
+   BACKUP & RESTORE FILE
+   KOPERASI (DOWNLOAD)
+========================= */
 
-/* =====================
-   BACKUP
-===================== */
-async function restore(){
-  try{
-    const [handle] = await window.showOpenFilePicker({
-      types: [{
-        description: "Backup Koperasi",
-        accept: { "application/json": [".json"] }
-      }]
-    });
+const DB_KEY = "koperasi_db";
 
-    const file = await handle.getFile();
-    const text = await file.text();
-    let db = JSON.parse(text);
-
-    db.user ??= { username:"admin", password:"1234" };
-    db.anggota ??= [];
-    db.simpanan ??= [];
-    db.pinjaman ??= [];
-    db.transaksi ??= [];
-    db.kas ??= [];
-
-    localStorage.setItem("koperasi_db", JSON.stringify(db));
-    alert("✅ Restore berhasil!");
-    location.reload();
-
-  }catch(e){
-    alert("❌ Restore dibatalkan");
-  }
-}
-function backup(){
-  const db = getDB();
-
+/* =========================
+   BACKUP KE FILE
+========================= */
+function backupToFile(){
+  const db = localStorage.getItem(DB_KEY);
   if(!db){
-    alert("Data kosong!");
+    alert("Data koperasi kosong!");
     return;
   }
 
-  const data = JSON.stringify(db, null, 2);
-  const blob = new Blob([data], { type: "application/json" });
+  const waktu = new Date();
+  const namaFile =
+    "backup-koperasi-" +
+    waktu.getFullYear() +
+    ("0"+(waktu.getMonth()+1)).slice(-2) +
+    ("0"+waktu.getDate()).slice(-2) + "-" +
+    ("0"+waktu.getHours()).slice(-2) +
+    ("0"+waktu.getMinutes()).slice(-2) +
+    ".json";
+
+  const blob = new Blob([db], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-
-  const now = new Date();
-  const tgl = now.toISOString().slice(0,10);
-  const jam = now.toTimeString().slice(0,5).replace(":","-");
-
-  const filename = `backup-koperasi-${tgl}-${jam}.json`;
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
+  a.download = namaFile;
   a.click();
-  document.body.removeChild(a);
+
   URL.revokeObjectURL(url);
 
-  alert("✅ Backup berhasil\n" + filename);
+  alert("Backup berhasil disimpan ke folder Download");
 }
 
-/* =====================
-   RESTORE
-===================== */
-function restore(){
-  const input = document.getElementById("fileRestore");
-
+/* =========================
+   RESTORE DARI FILE
+========================= */
+function restoreFromFile(){
+  const input = document.getElementById("restoreFile");
   if(!input || !input.files.length){
-    alert("Pilih file backup terlebih dahulu!");
+    alert("Pilih file backup dulu!");
     return;
   }
 
-  if(!confirm("⚠️ Data lama akan DIGANTI. Lanjutkan?")) return;
-
+  const file = input.files[0];
   const reader = new FileReader();
-  reader.onload = e=>{
+
+  reader.onload = function(e){
     try{
-      let db = JSON.parse(e.target.result);
+      const data = e.target.result;
+      JSON.parse(data); // validasi JSON
 
-      if(!db || typeof db !== "object"){
-        alert("File backup tidak valid!");
-        return;
-      }
+      localStorage.setItem(DB_KEY, data);
+      alert("Data berhasil direstore");
 
-      // normalisasi struktur koperasi
-      db.user ??= { username:"admin", password:"1234" };
-      db.anggota ??= [];
-      db.simpanan ??= [];
-      db.pinjaman ??= [];
-      db.transaksi ??= [];
-      db.kas ??= [];
-
-      localStorage.setItem("koperasi_db", JSON.stringify(db));
-      alert("✅ Restore berhasil!");
       location.reload();
-
     }catch(err){
-      alert("❌ File backup rusak!");
+      alert("File backup tidak valid");
     }
   };
 
-  reader.readAsText(input.files[0]);
+  reader.readAsText(file);
 }

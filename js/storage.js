@@ -23,8 +23,9 @@ function getDB(){
   return JSON.parse(db);
 }
 
+
 function saveDB(db){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  localStorage.setItem("koperasi_db", JSON.stringify(db));
 }
 
 function logout(){
